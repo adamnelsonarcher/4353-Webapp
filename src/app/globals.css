@@ -29,5 +29,48 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+}
+
+@layer components {
+  /* Layout */
+  .container-page {
+    @apply min-h-screen bg-background flex flex-col;
+  }
+  
+  .container-centered {
+    @apply container mx-auto px-4 py-8;
+  }
+  
+  /* Forms */
+  .form-container {
+    @apply max-w-md mx-auto;
+  }
+  
+  .form-input {
+    @apply w-full p-2 rounded-md border border-secondary bg-background;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium mb-1;
+  }
+  
+  /* Typography */
+  .heading-primary {
+    @apply text-2xl font-bold text-primary mb-8;
+  }
+  
+  .text-link {
+    @apply text-primary hover:underline transition-colors;
+  }
+  
+  /* Cards */
+  .feature-card {
+    @apply p-6 rounded-lg border border-secondary bg-background;
+  }
+
+  /* Container */
+  .container {
+    @apply max-w-7xl mx-auto;
+  }
 }

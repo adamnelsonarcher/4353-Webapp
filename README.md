@@ -1,44 +1,95 @@
-# Volunteer Management System
+# Group 1, Web App
+This is a how-to for my group, I hope you guys read this lol
 
-A web application for managing volunteers and events, built with Next.js 14 and TypeScript.
+## Assignment 2 Completion Status
 
-## Getting Started
+### Completed Features
+- Login system (demo with localStorage)
+- User Registration (email + password)
+- User Profile Management with:
+  - Personal info (name, address, etc.)
+  - Skills selection
+  - Availability system (with time slots!)
+  - Form validation
+- Responsive design
 
-1. Clone the repository
+### Still Needed
+1. Event Management Form
+   - Create/edit events
+   - All the required fields from assignment
+   
+2. Volunteer Matching Form
+   - View/match volunteers to events
+   - Auto-fill functionality
+   
+3. Notification System
+   - Display notifications
+   - Event assignments
+   
+4. Volunteer History
+   - Table view of participation
+   - Status tracking
+
+## Quick Start
+
+1. Clone the repo
+
 2. Install dependencies:
 ```bash
 npm install
 ```
 
-3. Run the development server:
+3. Run local devevlopment server:
 ```bash
 npm run dev
-# or
-yarn dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## Project Structure
 
-- `src/app/` - Main application code
-  - `page.tsx` - Homepage
-  - `layout.tsx` - Root layout with global styles
-  - `globals.css` - Global CSS styles
-- `public/` - Static assets
-
-## Features (To Be Implemented)
-
-- User Authentication (Login/Registration)
-- User Profile Management
-- Event Management
-- Volunteer Matching System
-- Notification System
-- Volunteer History Tracking
+Here's how our code is organized (please follow this structure when adding new features):
+Pretty much everything is in the `src/app` folder, and the `page.tsx` is the homepage.
+The rest of the folders are pretty self-explanatory.
+```
+src/
+├── app/                    
+│   ├── volunteer/         # All volunteer stuff
+│   │   ├── dashboard/     
+│   │   ├── login/        
+│   │   ├── profile/      # Profile management
+│   │   └── register/     
+│   ├── organization/     # Admin/Org stuff (needs work)
+│   │   ├── dashboard/    
+│   │   ├── login/       
+│   │   └── register/    
+│   └── page.tsx          # Homepage
+```
 
 ## Tech Stack
 
-- [Next.js 14](https://nextjs.org/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Geist Font](https://vercel.com/font)
+We're using:
+- Next.js 14 (latest version)
+- TypeScript (for type safety)
+- Tailwind CSS (for styling)
+- Geist Font (looks nice)
+
+## Development Guidelines
+
+### How to Add New Features
+1. Create a new branch for your feature (if the feature is major)
+2. Follow the existing code structure
+3. Use TypeScript
+4. Use Tailwind classes for styling
+5. Test your changes locally before pushing
+6. Merge into production, only do this after checking with another person
+
+### Styling
+- Check `src/styles/components.css` for reusable classes
+- Follow the design system in `globals.css`
+- Use the existing UI components when possible
+
+### State Management
+- Using React's useState for now
+- localStorage for demo data
+- No backend needed for this assignment
