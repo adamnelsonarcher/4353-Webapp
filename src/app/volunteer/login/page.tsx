@@ -10,13 +10,23 @@ export default function VolunteerLogin() {
     email: '',
     password: ''
   });
+  const [emailError, setEmailError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.email.includes('@') && formData.password.length >= 6) {
+    if (!formData.email.includes('@')) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+    if (formData.password.length >= 6) {
       localStorage.setItem('volunteerLoggedIn', 'true');
       router.push('/volunteer/dashboard');
     }
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({...formData, email: e.target.value});
+    setEmailError(''); // Clear error when user starts typing
   };
 
   return (
@@ -43,11 +53,14 @@ export default function VolunteerLogin() {
               <input
                 type="email"
                 id="email"
-                className="form-input"
+                className={`form-input ${emailError ? 'border-red-500' : ''}`}
                 placeholder="Enter your email"
                 value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                onChange={handleEmailChange}
               />
+              {emailError && (
+                <p className="text-red-500 text-sm mt-1">{emailError}</p>
+              )}
             </div>
             
             <div>
