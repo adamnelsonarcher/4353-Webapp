@@ -77,13 +77,15 @@ export default function VolunteerRegistration() {
         <div className="form-container">
           {/* Back Button */}
           <div className="mb-8">
-            <a 
+            <Button 
               href="/"
-              className="text-link inline-flex items-center gap-2"
+              variant="secondary"
+              size="sm"
+              className="hover:opacity-90 transition-opacity inline-flex items-center gap-2"
             >
               <span>←</span>
               <span>Back to Home</span>
-            </a>
+            </Button>
           </div>
 
           <h1 className="heading-primary">Volunteer Registration</h1>
@@ -145,7 +147,7 @@ export default function VolunteerRegistration() {
               )}
             </div>
 
-            <Button type="submit" variant="primary" className="w-full">
+            <Button type="submit" variant="primary" className="w-full hover:opacity-90 transition-opacity">
               Continue to Profile Setup
             </Button>
           </form>
@@ -153,7 +155,7 @@ export default function VolunteerRegistration() {
           <div className="mt-6 text-center">
             <p className="text-sm text-secondary-foreground">
               Already have an account?{" "}
-              <Button href="/volunteer/login" variant="secondary" size="sm">
+              <Button href="/volunteer/login" variant="secondary" size="sm" className="hover:opacity-90 transition-opacity">
                 Login
               </Button>
             </p>

@@ -7,13 +7,15 @@ export default function RegisterSelection() {
         <div className="form-container">
           {/* Back Button */}
           <div className="mb-8">
-            <a 
+            <Button 
               href="/"
-              className="text-link inline-flex items-center gap-2"
+              variant="secondary"
+              size="sm"
+              className="hover:opacity-90 transition-opacity inline-flex items-center gap-2"
             >
               <span>←</span>
               <span>Back to Home</span>
-            </a>
+            </Button>
           </div>
 
           <h1 className="heading-primary text-center">Join Our Community</h1>
@@ -25,7 +27,7 @@ export default function RegisterSelection() {
               <p className="text-secondary-foreground mb-6">
                 Find meaningful opportunities to contribute your skills and time to causes you care about.
               </p>
-              <Button href="/volunteer/register" variant="primary" className="w-full">
+              <Button href="/volunteer/register" variant="primary" className="w-full hover:opacity-90 transition-opacity">
                 Register as Volunteer
               </Button>
             </div>
@@ -36,7 +38,7 @@ export default function RegisterSelection() {
               <p className="text-secondary-foreground mb-6">
                 Connect with passionate volunteers and manage your volunteer programs effectively.
               </p>
-              <Button href="/organization/register" variant="primary" className="w-full">
+              <Button href="/organization/register" variant="primary" className="w-full hover:opacity-90 transition-opacity">
                 Register Organization
               </Button>
             </div>
@@ -45,7 +47,7 @@ export default function RegisterSelection() {
           <div className="mt-8 text-center">
             <p className="text-sm text-secondary-foreground">
               Already have an account?{" "}
-              <Button href="/volunteer/login" variant="secondary" size="sm">
+              <Button href="/volunteer/login" variant="secondary" size="sm" className="hover:opacity-90 transition-opacity">
                 Login
               </Button>
             </p>

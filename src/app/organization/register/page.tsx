@@ -7,13 +7,15 @@ export default function OrganizationRegistration() {
         <div className="form-container">
           {/* Back Button */}
           <div className="mb-8">
-            <a 
+            <Button 
               href="/organization/login"
-              className="text-link inline-flex items-center gap-2"
+              variant="secondary"
+              size="sm"
+              className="hover:opacity-90 transition-opacity inline-flex items-center gap-2"
             >
               <span>←</span>
               <span>Back to Login</span>
-            </a>
+            </Button>
           </div>
 
           <h1 className="heading-primary">Organization Registration</h1>
@@ -102,7 +104,7 @@ export default function OrganizationRegistration() {
               />
             </div>
 
-            <Button type="submit" variant="primary" className="w-full">
+            <Button type="submit" variant="primary" className="w-full hover:opacity-90 transition-opacity">
               Register Organization
             </Button>
           </form>
@@ -110,7 +112,7 @@ export default function OrganizationRegistration() {
           <div className="mt-6 text-center">
             <p className="text-sm text-secondary-foreground">
               Already have an account?{" "}
-              <Button href="/organization/login" variant="secondary" size="sm">
+              <Button href="/organization/login" variant="secondary" size="sm" className="hover:opacity-90 transition-opacity">
                 Login
               </Button>
             </p>
