@@ -18,6 +18,7 @@ export default function OrganizationDashboard() {
   const router = useRouter();
   const [showEventForm, setShowEventForm] = useState(false);
   const [showMatchingForm, setShowMatchingForm] = useState(false);
+  const [firstOpenedForm, setFirstOpenedForm] = useState<'event' | 'matching' | null>(null);
 
   const [eventFormData, setEventFormData] = useState<Event>({
     eventName: '',
@@ -29,6 +30,8 @@ export default function OrganizationDashboard() {
   });
 
   const [events, setEvents] = useState<Event[]>([]);
+
+  const TRANSITION_DURATION = 300;
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('organizationLoggedIn');
@@ -59,6 +62,30 @@ export default function OrganizationDashboard() {
     });
   };
 
+  const handleEventFormClick = () => {
+    if (!showEventForm && !showMatchingForm) {
+      setFirstOpenedForm('event');
+      setShowEventForm(true);
+    } else if (showEventForm) {
+      setShowEventForm(false);
+      setFirstOpenedForm(showMatchingForm ? 'matching' : null);
+    } else {
+      setShowEventForm(true);
+    }
+  };
+
+  const handleMatchingFormClick = () => {
+    if (!showMatchingForm && !showEventForm) {
+      setFirstOpenedForm('matching');
+      setShowMatchingForm(true);
+    } else if (showMatchingForm) {
+      setShowMatchingForm(false);
+      setFirstOpenedForm(showEventForm ? 'event' : null);
+    } else {
+      setShowMatchingForm(true);
+    }
+  };
+
   return (
     <div className="container-page">
       <div className="container mx-auto px-4 py-8">
@@ -78,18 +105,23 @@ export default function OrganizationDashboard() {
         
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* Event Management */}
-          <div className="feature-card">
+          <div className={`feature-card transition-all duration-300 ease-in-out ${
+            showEventForm ? 'col-span-full row-span-2 h-auto' : 'h-[200px]'
+          } ${firstOpenedForm === 'event' ? 'order-first' : 'order-none'}`}>
             <h2 className="text-xl font-semibold mb-4">Event Management</h2>
             <Button 
-              onClick={() => setShowEventForm(!showEventForm)} 
+              onClick={handleEventFormClick}
               variant="primary"
               className="hover:opacity-90 transition-opacity"
             >
               {showEventForm ? 'Hide Event Form' : 'Create New Event'}
             </Button>
             
-            {showEventForm && (
-              <div className="mt-4 p-4 bg-secondary/10 rounded-lg">
+            <div className={`
+              mt-4 overflow-hidden transition-all duration-300 ease-in-out
+              ${showEventForm ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}
+            `}>
+              <div className="p-4 bg-secondary/10 rounded-lg">
                 <form onSubmit={handleEventSubmit} className="space-y-4">
                   <div>
                     <label className="block font-medium mb-1">
@@ -195,22 +227,27 @@ export default function OrganizationDashboard() {
                   </Button>
                 </form>
               </div>
-            )}
+            </div>
           </div>
           
           {/* Volunteer Matching */}
-          <div className="feature-card">
+          <div className={`feature-card transition-all duration-300 ease-in-out ${
+            showMatchingForm ? 'col-span-full row-span-2 h-auto' : 'h-[200px]'
+          } ${firstOpenedForm === 'matching' ? 'order-first' : 'order-none'}`}>
             <h2 className="text-xl font-semibold mb-4">Volunteer Matching</h2>
             <Button 
-              onClick={() => setShowMatchingForm(!showMatchingForm)}
+              onClick={handleMatchingFormClick}
               variant="primary"
               className="hover:opacity-90 transition-opacity"
             >
               {showMatchingForm ? 'Hide Matching Form' : 'Match Volunteers'}
             </Button>
 
-            {showMatchingForm && (
-              <div className="mt-4 p-4 bg-secondary/10 rounded-lg">
+            <div className={`
+              mt-4 overflow-hidden transition-all duration-300 ease-in-out
+              ${showMatchingForm ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}
+            `}>
+              <div className="p-4 bg-secondary/10 rounded-lg">
                 <form className="space-y-4">
                   <div>
                     <label className="block font-medium mb-1">Select Volunteer</label>
@@ -237,26 +274,32 @@ export default function OrganizationDashboard() {
                   </Button>
                 </form>
               </div>
-            )}
+            </div>
           </div>
           
           {/* Notifications */}
-          <div className="feature-card">
+          <div className={`feature-card h-[200px] ${
+            firstOpenedForm ? 'order-last' : 'order-none'
+          }`}>
             <h2 className="text-xl font-semibold mb-4">Notifications</h2>
             <p className="text-secondary-foreground">No new notifications</p>
           </div>
 
           {/* Volunteer History */}
-          <div className="feature-card">
+          <div className={`feature-card h-[200px] ${
+            firstOpenedForm ? 'order-last' : 'order-none'
+          }`}>
             <h2 className="text-xl font-semibold mb-4">Volunteer History</h2>
             <p className="text-secondary-foreground">No volunteer history available</p>
           </div>
           
           {/* Quick Stats */}
-          <div className="feature-card">
+          <div className={`feature-card h-[200px] ${
+            firstOpenedForm ? 'order-last' : 'order-none'
+          }`}>
             <h2 className="text-xl font-semibold mb-4">Quick Stats</h2>
             <div className="space-y-2">
-              <p className="text-secondary-foreground">Active Events: 0</p>
+              <p className="text-secondary-foreground">Active Events: {events.length}</p>
               <p className="text-secondary-foreground">Total Volunteers: 0</p>
               <p className="text-secondary-foreground">Pending Applications: 0</p>
             </div>
