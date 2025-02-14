@@ -26,6 +26,12 @@ interface MatchedEvent {
   skills: string[];
 }
 
+interface Notification {
+  id: number;
+  message: string;
+  date: string;
+}
+
 export default function OrganizationDashboard() {
   const router = useRouter();
   const [showEventForm, setShowEventForm] = useState(false);
@@ -44,6 +50,23 @@ export default function OrganizationDashboard() {
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
   const [matchedEvents, setMatchedEvents] = useState<MatchedEvent[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([
+    {
+      id: 1,
+      message: "Notification 1",
+      date: "2024-03-15"
+    },
+    {
+      id: 2,
+      message: "Notification 2",
+      date: "2024-03-14"
+    },
+    {
+      id: 3,
+      message: "Notification 3",
+      date: "2024-03-13"
+    }
+  ]);
 
   const TRANSITION_DURATION = 300;
 
@@ -377,7 +400,17 @@ export default function OrganizationDashboard() {
             firstOpenedForm ? 'order-last' : 'order-none'
           }`}>
             <h2 className="text-xl font-semibold mb-4">Notifications</h2>
-            <p className="text-secondary-foreground">No new notifications</p>
+            <div className="space-y-2 overflow-y-auto max-h-[120px]">
+              {notifications.map((notification) => (
+                <div 
+                  key={notification.id}
+                  className="p-2 rounded-lg hover:bg-secondary/5 transition-colors cursor-pointer"
+                >
+                  <p className="text-secondary-foreground">{notification.message}</p>
+                  <p className="text-xs text-secondary-foreground/70">{new Date(notification.date).toLocaleDateString()}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Volunteer History */}
