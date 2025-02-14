@@ -14,8 +14,9 @@ export default function OrganizationLogin() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.email.includes('@')) {
-      setEmailError('Please enter a valid email address');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setEmailError('Please enter a valid email');
       return;
     }
     if (formData.password.length >= 6) {
@@ -33,6 +34,11 @@ export default function OrganizationLogin() {
     <div className="container-page">
       <div className="container-centered">
         <div className="form-container">
+          {/* Test Notice */}
+          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+            Because this is just a frontend test, enter any email in the email section and anything in the password to get taken to the dashboard.
+          </div>
+
           {/* Back Button */}
           <div className="mb-8">
             <Button 
