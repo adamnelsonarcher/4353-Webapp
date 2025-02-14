@@ -14,6 +14,18 @@ interface Event {
   eventDate: string;
 }
 
+interface Volunteer {
+  name: string;
+  skills: string[];
+  preferences: string[];
+}
+
+interface MatchedEvent {
+  eventName: string;
+  description: string;
+  skills: string[];
+}
+
 export default function OrganizationDashboard() {
   const router = useRouter();
   const [showEventForm, setShowEventForm] = useState(false);
@@ -30,6 +42,8 @@ export default function OrganizationDashboard() {
   });
 
   const [events, setEvents] = useState<Event[]>([]);
+  const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
+  const [matchedEvents, setMatchedEvents] = useState<MatchedEvent[]>([]);
 
   const TRANSITION_DURATION = 300;
 
@@ -84,6 +98,47 @@ export default function OrganizationDashboard() {
     } else {
       setShowMatchingForm(true);
     }
+  };
+
+  const handleVolunteerSelect = (volunteerId: string) => {
+    // This would normally come from an API, using mock data for now
+    const mockVolunteerData: Record<string, Volunteer> = {
+      "1": {
+        name: "John Doe",
+        skills: ["deploy", "code"],
+        preferences: ["night"]
+      },
+      "2": {
+        name: "Jane Smith",
+        skills: ["packing", "assisting"],
+        preferences: ["morning"]
+      }
+    };
+
+    const mockMatchedEvents: Record<string, MatchedEvent[]> = {
+      "1": [
+        {
+          eventName: "Tech Workshop",
+          description: "Teaching basic coding skills",
+          skills: ["code", "teaching"]
+        }
+      ],
+      "2": [
+        {
+          eventName: "Blood Drive",
+          description: "Saving lives",
+          skills: ["packing", "assisting"]
+        },
+        {
+          eventName: "Donation",
+          description: "Donate",
+          skills: ["packing", "assisting"]
+        }
+      ]
+    };
+
+    setSelectedVolunteer(mockVolunteerData[volunteerId]);
+    setMatchedEvents(mockMatchedEvents[volunteerId] || []);
   };
 
   return (
@@ -248,31 +303,71 @@ export default function OrganizationDashboard() {
               ${showMatchingForm ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}
             `}>
               <div className="p-4 bg-secondary/10 rounded-lg">
-                <form className="space-y-4">
+                <div className="space-y-4">
                   <div>
-                    <label className="block font-medium mb-1">Select Volunteer</label>
-                    <select className="form-input">
-                      <option value="">Choose a volunteer</option>
-                      <option value="1">John Doe - Teaching, Cooking</option>
-                      <option value="2">Jane Smith - Coding, Communication</option>
+                    <label className="block font-medium mb-1">Select a Volunteer</label>
+                    <select 
+                      className="form-input w-full"
+                      onChange={(e) => handleVolunteerSelect(e.target.value)}
+                      defaultValue=""
+                    >
+                      <option value="" disabled>Select a Volunteer</option>
+                      <option value="1">John Doe</option>
+                      <option value="2">Jane Smith</option>
                     </select>
                   </div>
 
-                  <div>
-                    <label className="block font-medium mb-1">Matched Events</label>
-                    <select className="form-input" disabled>
-                      <option>No matching events found</option>
-                    </select>
-                  </div>
+                  {selectedVolunteer && (
+                    <div className="mt-6 space-y-4">
+                      <div className="bg-background p-4 rounded-lg">
+                        <h3 className="text-lg font-medium text-primary mb-2">
+                          {selectedVolunteer.name}
+                        </h3>
+                        <div className="space-y-2">
+                          <p className="text-sm">
+                            <span className="font-medium">Skills:</span>{' '}
+                            {selectedVolunteer.skills.join(', ')}
+                          </p>
+                          <p className="text-sm">
+                            <span className="font-medium">Preferences:</span>{' '}
+                            {selectedVolunteer.preferences.join(', ')}
+                          </p>
+                        </div>
+                      </div>
 
-                  <Button 
-                    type="submit" 
-                    variant="primary"
-                    className="w-full hover:opacity-90 transition-opacity"
-                  >
-                    Confirm Match
-                  </Button>
-                </form>
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Matching Events</h4>
+                        <div className="space-y-2">
+                          {matchedEvents.map((event, index) => (
+                            <div 
+                              key={index}
+                              className="bg-background p-4 rounded-lg hover:bg-secondary/5 transition-colors"
+                            >
+                              <h5 className="font-medium">{event.eventName}</h5>
+                              <p className="text-sm text-secondary-foreground">{event.description}</p>
+                              <p className="text-sm mt-1">
+                                <span className="font-medium">Required Skills:</span>{' '}
+                                {event.skills.join(', ')}
+                              </p>
+                            </div>
+                          ))}
+                          {matchedEvents.length === 0 && (
+                            <p className="text-secondary-foreground">No matching events found</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <Button 
+                        type="button" 
+                        variant="primary"
+                        className="w-full hover:opacity-90 transition-opacity"
+                        disabled={matchedEvents.length === 0}
+                      >
+                        Confirm Match
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
