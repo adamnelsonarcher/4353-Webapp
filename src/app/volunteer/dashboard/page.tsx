@@ -26,12 +26,13 @@ export default function VolunteerDashboard() {
               localStorage.removeItem('volunteerLoggedIn');
               router.push('/');
             }}
+            className="hover:opacity-90 transition-opacity"
           >
             Logout
           </Button>
         </div>
         
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-6">
           <div className="feature-card">
             <h2 className="text-xl font-semibold mb-4">My Events</h2>
             <p className="text-secondary-foreground">No upcoming events</p>
@@ -47,12 +48,9 @@ export default function VolunteerDashboard() {
             <p className="text-secondary-foreground">No availability set</p>
           </div>
         </div>
-        <div className="p-6">
-          <VolunteerHistory />
-        </div>
 
+        <VolunteerHistory />
       </div>
     </div>
-    
   );
 } 
