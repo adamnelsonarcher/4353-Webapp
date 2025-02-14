@@ -12,23 +12,13 @@ This is a how-to for my group, I hope you guys read this lol
   - Availability system (with time slots!)
   - Form validation
 - Responsive design
+- Event management form
+- volunteer matching form
+- notification system
+- volunteer history
 
 ### Still Needed
-1. Event Management Form
-   - Create/edit events
-   - All the required fields from assignment
-   
-2. Volunteer Matching Form
-   - View/match volunteers to events
-   - Auto-fill functionality
-   
-3. Notification System
-   - Display notifications
-   - Event assignments
-   
-4. Volunteer History
-   - Table view of participation
-   - Status tracking
+1. Completed report 
 
 ## Quick Start
 
