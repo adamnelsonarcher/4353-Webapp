@@ -7,13 +7,15 @@ export default function Login() {
         <div className="form-container">
           {/* Back Button */}
           <div className="mb-8">
-            <a 
+            <Button 
               href="/"
-              className="text-link inline-flex items-center gap-2"
+              variant="secondary"
+              size="sm"
+              className="hover:opacity-90 transition-opacity inline-flex items-center gap-2"
             >
               <span>←</span>
               <span>Back to Home</span>
-            </a>
+            </Button>
           </div>
 
           <h1 className="heading-primary">Volunteer Login</h1>
@@ -43,13 +45,17 @@ export default function Login() {
               />
             </div>
             
-            <Button type="submit" variant="primary" className="w-full">
+            <Button type="submit" variant="primary" className="w-full hover:opacity-90 transition-opacity">
               Login
             </Button>
           </form>
           
           <div className="mt-6 text-center space-y-4">
-            <Button href="/login/admin" variant="secondary">
+            <Button 
+              href="/login/admin" 
+              variant="secondary"
+              className="hover:opacity-90 transition-opacity"
+            >
               Administrator Login →
             </Button>
             
@@ -58,10 +64,20 @@ export default function Login() {
             </p>
             
             <div className="space-x-4">
-              <Button href="/register/volunteer" variant="accent" size="sm">
+              <Button 
+                href="/register/volunteer" 
+                variant="accent" 
+                size="sm"
+                className="hover:opacity-90 transition-opacity"
+              >
                 Register as Volunteer
               </Button>
-              <Button href="/register/organization" variant="accent" size="sm">
+              <Button 
+                href="/register/organization" 
+                variant="accent" 
+                size="sm"
+                className="hover:opacity-90 transition-opacity"
+              >
                 Register Organization
               </Button>
             </div>

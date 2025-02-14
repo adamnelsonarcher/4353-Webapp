@@ -9,10 +9,10 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-primary">Volunteer Connect</h1>
           <div className="space-x-4">
-            <Button href="/volunteer/login" variant="secondary" size="sm">
+            <Button href="/volunteer/login" variant="secondary" size="sm" className="hover:opacity-90 transition-opacity">
               Volunteer Login
             </Button>
-            <Button href="/organization/login" variant="primary" size="sm">
+            <Button href="/organization/login" variant="primary" size="sm" className="hover:opacity-90 transition-opacity">
               Organization Login
             </Button>
           </div>
@@ -27,7 +27,7 @@ export default function Home() {
             <p className="text-lg mb-8 text-secondary-foreground">
               A smart platform connecting volunteers with meaningful opportunities based on skills and availability.
             </p>
-            <Button href="/register" variant="primary" size="lg">
+            <Button href="/register" variant="primary" size="lg" className="hover:opacity-90 transition-opacity">
               Register with Us
             </Button>
           </div>
@@ -76,7 +76,8 @@ export default function Home() {
       <footer className="border-t border-secondary mt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-sm text-secondary-foreground">
-            <p>© 2024 Volunteer Connect. All rights reserved.</p>
+          <p>Built for Group 1 in Singh's COSC4353. Not a real website.</p>
+          <p>© 2025 Volunteer Connect. All rights reserved.</p>
           </div>
         </div>
       </footer>

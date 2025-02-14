@@ -24,10 +24,15 @@ export default function VolunteerLogin() {
       <div className="container-centered">
         <div className="form-container">
           <div className="mb-8">
-            <a href="/" className="text-link inline-flex items-center gap-2">
+            <Button 
+              href="/"
+              variant="secondary"
+              size="sm"
+              className="hover:opacity-90 transition-opacity inline-flex items-center gap-2"
+            >
               <span>←</span>
               <span>Back to Home</span>
-            </a>
+            </Button>
           </div>
 
           <h1 className="heading-primary">Volunteer Login</h1>
@@ -57,14 +62,25 @@ export default function VolunteerLogin() {
               />
             </div>
             
-            <Button type="submit" variant="primary" className="w-full">Login</Button>
+            <Button 
+              type="submit" 
+              variant="primary" 
+              className="w-full hover:opacity-90 transition-opacity"
+            >
+              Login
+            </Button>
           </form>
           
           <div className="mt-6 text-center">
             <p className="text-sm text-secondary-foreground mb-4">
               Don't have an account?
             </p>
-            <Button href="/volunteer/register" variant="accent" size="sm">
+            <Button 
+              href="/volunteer/register" 
+              variant="accent" 
+              size="sm"
+              className="hover:opacity-90 transition-opacity"
+            >
               Register as Volunteer
             </Button>
           </div>
