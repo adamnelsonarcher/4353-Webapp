@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import VolunteerHistory from "./VolunteerHistory";
 
 export default function VolunteerDashboard() {
   const router = useRouter();
@@ -45,7 +46,12 @@ export default function VolunteerDashboard() {
             <p className="text-secondary-foreground">No availability set</p>
           </div>
         </div>
+        <div className="p-6">
+          <VolunteerHistory />
+        </div>
+
       </div>
     </div>
+    
   );
 } 
