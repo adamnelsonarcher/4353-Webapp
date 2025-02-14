@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Button } from "@/components/ui/button";
 
 export default function OrganizationDashboard() {
   const router = useRouter();
@@ -20,15 +21,15 @@ export default function OrganizationDashboard() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Welcome, [Organization Name]</h1>
-          <button 
+          <Button 
+            variant="secondary"
             onClick={() => {
               localStorage.removeItem('organizationLoggedIn');
-              router.push('/organization/login');
+              router.push('/');
             }}
-            className="text-sm text-red-500 hover:text-red-700"
           >
             Logout
-          </button>
+          </Button>
         </div>
         
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export default function eventForm() {
   const router = useRouter();
@@ -135,6 +136,16 @@ export default function eventForm() {
                   className="w-1/4 px-1/4 py-1/2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+
+              <Button 
+                variant="secondary"
+                onClick={() => {
+                  localStorage.removeItem('organizationLoggedIn');
+                  router.push('/');
+                }}
+              >
+                Logout
+              </Button>
 
               <button type="submit">Create Event</button>
             </form>
