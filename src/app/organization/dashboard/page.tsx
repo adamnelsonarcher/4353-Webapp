@@ -2,12 +2,14 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function OrganizationDashboard() {
   const router = useRouter();
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('organizationLoggedIn');
+    console.log(isLoggedIn);
     if (!isLoggedIn) {
       router.push('/organization/login');
     }
@@ -40,7 +42,9 @@ export default function OrganizationDashboard() {
           {/* Volunteer Matching */}
           <div className="feature-card">
             <h2 className="text-xl font-semibold mb-4">Volunteer Matching</h2>
-            <button className="text-primary hover:underline">Match Volunteers</button>
+            <Link href="/organization/matching" className="text-primary hover:underline">
+              Match Volunteers
+            </Link>
             <p className="text-secondary-foreground mt-2">No pending matches</p>
           </div>
           
