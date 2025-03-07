@@ -89,6 +89,16 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check required fields first
+    if (!body.eventName || !body.eventDescription || !body.location || 
+        !body.requiredSkills || !body.urgency || !body.eventDate) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Then proceed with other validations
     if (body.eventName.length > VALIDATION.EVENT_NAME_MAX) {
       return NextResponse.json(
         { error: `Event name must be ${VALIDATION.EVENT_NAME_MAX} characters or less` },
@@ -107,14 +117,6 @@ export async function POST(request: Request) {
     if (!VALIDATION.VALID_URGENCY.includes(body.urgency)) {
       return NextResponse.json(
         { error: 'Invalid urgency level' },
-        { status: 400 }
-      );
-    }
-
-    if (!body.eventName || !body.eventDescription || !body.location || 
-        !body.requiredSkills || !body.urgency || !body.eventDate) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
         { status: 400 }
       );
     }
