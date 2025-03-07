@@ -78,25 +78,47 @@ export default function OrganizationDashboard() {
     }
   }, [router]);
 
-  const handleEventSubmit = (e: React.FormEvent) => {
+  const handleEventSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!eventFormData.eventName || !eventFormData.description || 
         !eventFormData.location || eventFormData.requiredSkills.length === 0 || 
         !eventFormData.urgency || !eventFormData.eventDate) {
       alert('Please fill in all required fields');
       return;
     }
-    
-    setEvents([...events, eventFormData]);
-    setShowEventForm(false);
-    setEventFormData({
-      eventName: '',
-      description: '',
-      location: '',
-      requiredSkills: [],
-      urgency: '',
-      eventDate: '',
-    });
+
+    try {
+      const email = localStorage.getItem('organizationEmail');
+      const response = await fetch('/api/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-email': email || ''
+        },
+        body: JSON.stringify(eventFormData)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setEvents(prev => [...prev, data.event]);
+        setShowEventForm(false);
+        setEventFormData({
+          eventName: '',
+          description: '',
+          location: '',
+          requiredSkills: [],
+          urgency: '',
+          eventDate: '',
+        });
+      } else {
+        alert(data.error || 'Failed to create event');
+      }
+    } catch (error) {
+      console.error('Failed to create event:', error);
+      alert('Failed to create event. Please try again.');
+    }
   };
 
   const handleEventFormClick = () => {

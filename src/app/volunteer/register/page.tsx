@@ -44,15 +44,40 @@ export default function VolunteerRegistration() {
     return isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (validateForm()) {
-      // Store email temporarily (later this will be handled by backend)
-      localStorage.setItem('pendingRegistration', formData.email);
-      
-      // Redirect to profile completion
-      router.push('/volunteer/profile');
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            userType: 'volunteer'
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('pendingRegistration', formData.email);
+          router.push('/volunteer/profile');
+        } else {
+          setErrors(prev => ({
+            ...prev,
+            email: data.error
+          }));
+        }
+      } catch (error) {
+        setErrors(prev => ({
+          ...prev,
+          email: 'An error occurred. Please try again.'
+        }));
+      }
     }
   };
 

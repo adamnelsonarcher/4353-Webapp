@@ -1,85 +1,26 @@
-# Group 1, Web App
-This is a how-to for my group, I hope you guys read this lol
+This is assignment 3 now, here are the requirements:
 
-## Assignment 2 Completion Status
+Additional Details
+Back end must include the following components/modules:
 
-### Completed Features
-- Login system (demo with localStorage)
-- User Registration (email + password)
-- User Profile Management with:
-  - Personal info (name, address, etc.)
-  - Skills selection
-  - Availability system (with time slots!)
-  - Form validation
-- Responsive design
-- Event management form
-- volunteer matching form
-- notification system
-- volunteer history
-
-### Still Needed
-1. Completed report 
-
-## Quick Start
-
-1. Clone the repo
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Run local devevlopment server:
-```bash
-npm run dev
-```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
-
-## Project Structure
-
-Here's how our code is organized (please follow this structure when adding new features):
-Pretty much everything is in the `src/app` folder, and the `page.tsx` is the homepage.
-The rest of the folders are pretty self-explanatory.
-```
-src/
-├── app/                    
-│   ├── volunteer/         # All volunteer stuff
-│   │   ├── dashboard/     
-│   │   ├── login/        
-│   │   ├── profile/      # Profile management
-│   │   └── register/     
-│   ├── organization/     # Admin/Org stuff (needs work)
-│   │   ├── dashboard/    
-│   │   ├── login/       
-│   │   └── register/    
-│   └── page.tsx          # Homepage
-```
-
-## Tech Stack
-
-We're using:
-- Next.js 14 (latest version)
-- TypeScript (for type safety)
-- Tailwind CSS (for styling)
-- Geist Font (looks nice)
-
-## Development Guidelines
-
-### How to Add New Features
-1. Create a new branch for your feature (if the feature is major)
-2. Follow the existing code structure
-3. Use TypeScript
-4. Use Tailwind classes for styling
-5. Test your changes locally before pushing
-6. Merge into production, only do this after checking with another person
-
-### Styling
-- Check `src/styles/components.css` for reusable classes
-- Follow the design system in `globals.css`
-- Use the existing UI components when possible
-
-### State Management
-- Using React's useState for now
-- localStorage for demo data
-- No backend needed for this assignment
+Login Module: Handle user authentication, registration, and login functionality.
+User Profile Management Module: Manage user profile data, including location, skills, preferences, and availability.
+Event Management Module: Create and manage events, including required skills, location, urgency, and event details.
+Volunteer Matching Module: Implement logic to match volunteers to events based on their profiles and event requirements.
+Notification Module: Logic to send notifications to volunteers for event assignments, updates, and reminders.
+Volunteer History Module: Track and display volunteer participation history.
+Important Deliverables
+Validations: Ensure validations are in place for required fields, field types, and field lengths in the backend code.
+Unit Tests: All backend code should be covered by unit tests. Code coverage should be greater than 80%. Research how to run the code coverage reports. Each IDE has plugins to generate reports. Here are a few pointers: Stackify Code Coverage ToolsLinks to an external site.
+Integration with Front End: All front-end components should be connected to the back end. Form data should be populated from the back end. The back end should receive data from the front end, validate it, and prepare it to persist to the database.
+No Database Implementation: We are not implementing the database yet. For this assignment, you can hard code the values.
+Submission Requirements
+Submit a Word/PDF document with your answers.
+Use GitHub for your group collaboration and code.
+Answer these Questions:
+GitHub Repository Link (5 points)
+Provide the link to your GitHub repository for TAs to view the code. Code should include unit tests.
+Backend Technologies (2 points)
+List what backend technologies you are using and why.
+Team Contributions (3 points)
+List who did what within the group. TAs should be able to validate in GitHub; otherwise, team members who didn't contribute will receive a ZERO.
