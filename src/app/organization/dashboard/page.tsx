@@ -122,6 +122,36 @@ export default function OrganizationDashboard() {
       return;
     }
 
+    const today = new Date().toISOString().split('T')[0];
+    const maxDate = new Date();
+    maxDate.setFullYear(maxDate.getFullYear() + 1);
+    const maxDateStr = maxDate.toISOString().split('T')[0];
+
+    if (eventFormData.eventDate < today) {
+      alert('Event date cannot be in the past');
+      return;
+    }
+
+    if (eventFormData.eventDate > maxDateStr) {
+      alert('Event date cannot be more than 1 year in the future');
+      return;
+    }
+
+    if (eventFormData.requiredSkills.length > 5) {
+      alert('Maximum 5 skills can be selected');
+      return;
+    }
+
+    if (eventFormData.eventDescription.trim().split(/\s+/).length < 5) {
+      alert('Event description must contain at least 5 words');
+      return;
+    }
+
+    if (!/^[A-Za-z0-9\s,.-]+$/.test(eventFormData.location)) {
+      alert('Location contains invalid characters');
+      return;
+    }
+
     try {
       const email = localStorage.getItem('organizationEmail');
       const response = await fetch('/api/events', {

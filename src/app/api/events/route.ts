@@ -53,7 +53,12 @@ const VALIDATION = {
     "Empathy",
     "Teamwork"
   ],
-  VALID_URGENCY: ["Low", "Medium", "High"]
+  VALID_URGENCY: ["Low", "Medium", "High"],
+  DATE_MIN: new Date().toISOString().split('T')[0], // Today
+  DATE_MAX: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year from now
+  MIN_SKILLS: 1,
+  MAX_SKILLS: 5,
+  LOCATION_PATTERN: /^[A-Za-z0-9\s,.-]+$/,  // Alphanumeric with basic punctuation
 };
 
 export async function GET(request: Request) {
@@ -115,6 +120,51 @@ export async function POST(request: Request) {
         !body.requiredSkills || !body.urgency || !body.eventDate) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Enhanced validation in POST function
+    // Validate event date range
+    const eventDate = new Date(body.eventDate);
+    const today = new Date(VALIDATION.DATE_MIN);
+    const maxDate = new Date(VALIDATION.DATE_MAX);
+
+    if (eventDate < today) {
+      return NextResponse.json(
+        { error: 'Event date cannot be in the past' },
+        { status: 400 }
+      );
+    }
+
+    if (eventDate > maxDate) {
+      return NextResponse.json(
+        { error: 'Event date cannot be more than 1 year in the future' },
+        { status: 400 }
+      );
+    }
+
+    // Validate number of skills
+    if (body.requiredSkills.length < VALIDATION.MIN_SKILLS || 
+        body.requiredSkills.length > VALIDATION.MAX_SKILLS) {
+      return NextResponse.json(
+        { error: `Number of required skills must be between ${VALIDATION.MIN_SKILLS} and ${VALIDATION.MAX_SKILLS}` },
+        { status: 400 }
+      );
+    }
+
+    // Validate location format
+    if (!VALIDATION.LOCATION_PATTERN.test(body.location)) {
+      return NextResponse.json(
+        { error: 'Location contains invalid characters' },
+        { status: 400 }
+      );
+    }
+
+    // Validate description has meaningful content
+    if (body.eventDescription.trim().split(/\s+/).length < 5) {
+      return NextResponse.json(
+        { error: 'Event description must contain at least 5 words' },
         { status: 400 }
       );
     }
