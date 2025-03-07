@@ -11,7 +11,6 @@ interface Event {
   status?: 'Pending' | 'Participated' | 'Canceled' | 'No Show';
 }
 
-// In-memory storage for demo
 const events: Event[] = [
   {
     id: '1',
@@ -33,10 +32,8 @@ const events: Event[] = [
   }
 ];
 
-// In-memory storage for volunteer event assignments
 const volunteerEvents: Record<string, Event[]> = {};
 
-// Validation constants
 const VALIDATION = {
   EVENT_NAME_MAX: 100,
   DESC_MAX: 500,
@@ -58,13 +55,13 @@ const VALIDATION = {
   DATE_MAX: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year from now
   MIN_SKILLS: 1,
   MAX_SKILLS: 5,
-  LOCATION_PATTERN: /^[A-Za-z0-9\s,.-]+$/,  // Alphanumeric with basic punctuation
+  LOCATION_PATTERN: /^[A-Za-z0-9\s,.-]+$/, 
 };
 
 export async function GET(request: Request) {
   const email = request.headers.get('x-user-email');
   const searchParams = new URL(request.url).searchParams;
-  const type = searchParams.get('type'); // 'all' or 'history'
+  const type = searchParams.get('type'); 
 
   if (!email) {
     return NextResponse.json(
@@ -92,7 +89,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validation checks
     if (body.eventName.length > VALIDATION.EVENT_NAME_MAX) {
       return NextResponse.json(
         { error: `Event name must be ${VALIDATION.EVENT_NAME_MAX} characters or less` },
@@ -115,7 +111,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate required fields
     if (!body.eventName || !body.eventDescription || !body.location || 
         !body.requiredSkills || !body.urgency || !body.eventDate) {
       return NextResponse.json(
@@ -124,8 +119,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Enhanced validation in POST function
-    // Validate event date range
     const eventDate = new Date(body.eventDate);
     const today = new Date(VALIDATION.DATE_MIN);
     const maxDate = new Date(VALIDATION.DATE_MAX);
@@ -144,7 +137,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate number of skills
     if (body.requiredSkills.length < VALIDATION.MIN_SKILLS || 
         body.requiredSkills.length > VALIDATION.MAX_SKILLS) {
       return NextResponse.json(
@@ -153,7 +145,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate location format
     if (!VALIDATION.LOCATION_PATTERN.test(body.location)) {
       return NextResponse.json(
         { error: 'Location contains invalid characters' },
@@ -161,7 +152,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate description has meaningful content
     if (body.eventDescription.trim().split(/\s+/).length < 5) {
       return NextResponse.json(
         { error: 'Event description must contain at least 5 words' },

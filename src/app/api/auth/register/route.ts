@@ -6,14 +6,12 @@ interface RegistrationRequest {
   userType: 'volunteer' | 'organization';
 }
 
-// In-memory storage for demo
 const registeredUsers: RegistrationRequest[] = [];
 
 export async function POST(request: Request) {
   try {
     const body: RegistrationRequest = await request.json();
 
-    // Validate request body
     if (!body.email || !body.password || !body.userType) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -21,7 +19,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(body.email)) {
       return NextResponse.json(
@@ -30,7 +27,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Password validation
     if (body.password.length < 8) {
       return NextResponse.json(
         { error: 'Password must be at least 8 characters long' },
@@ -38,7 +34,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if email already exists
     if (registeredUsers.some(user => user.email === body.email)) {
       return NextResponse.json(
         { error: 'Email already registered' },
@@ -46,7 +41,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Store user (in real app, this would be a DB operation)
     registeredUsers.push(body);
 
     return NextResponse.json({

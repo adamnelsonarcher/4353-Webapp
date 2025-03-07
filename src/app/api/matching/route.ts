@@ -38,14 +38,12 @@ export async function GET(request: Request) {
     );
   }
 
-  // Match events based on skills and availability
   const matchedEvents = events.filter(event => {
-    // Check if user has any of the required skills
     const hasRequiredSkills = event.requiredSkills.some(skill => 
       userProfile.skills.includes(skill)
     );
 
-    // Check if user is available on event date
+
     const eventDate = event.eventDate.split('T')[0]; // Get just the date part
     const isAvailable = userProfile.availability.some(a => 
       a.date.split('T')[0] === eventDate

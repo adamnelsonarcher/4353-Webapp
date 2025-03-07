@@ -8,7 +8,6 @@ interface Notification {
   type: 'event_match' | 'event_reminder' | 'event_update' | 'system';
 }
 
-// In-memory storage for notifications
 const notifications: Notification[] = [
   {
     id: 1,
@@ -43,7 +42,6 @@ export async function GET(request: Request) {
     );
   }
 
-  // Filter notifications for the specific user
   const userNotifications = notifications.filter(
     notification => notification.userEmail === email
   );

@@ -27,7 +27,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate required fields
     if (!body.fullName || !body.address1 || !body.city || 
         !body.state || !body.zipCode || !body.skills?.length) {
       return NextResponse.json(
@@ -36,7 +35,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate zipcode format
     const zipRegex = /^\d{5}(-\d{4})?$/;
     if (!zipRegex.test(body.zipCode)) {
       return NextResponse.json(
@@ -44,8 +42,6 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
-    // Store profile
     profileStore[email] = body;
 
     return NextResponse.json({

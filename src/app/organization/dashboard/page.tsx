@@ -100,7 +100,6 @@ export default function OrganizationDashboard() {
   const handleEventSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate required fields first
     if (!eventFormData.eventName || !eventFormData.eventDescription || 
         !eventFormData.location || !eventFormData.requiredSkills.length || 
         !eventFormData.urgency || !eventFormData.eventDate) {

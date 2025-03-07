@@ -21,7 +21,6 @@ export default function VolunteerDashboard() {
     if (!isLoggedIn) {
       router.push('/volunteer/login');
     } else {
-      // Fetch notifications
       const fetchNotifications = async () => {
         try {
           const email = localStorage.getItem('userEmail');

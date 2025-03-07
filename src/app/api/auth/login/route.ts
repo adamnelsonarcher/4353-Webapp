@@ -6,7 +6,7 @@ interface LoginRequest {
   userType: 'volunteer' | 'organization';
 }
 
-// Hardcoded users for demo
+// Hardcoded users for demo, for assignment 3, this will be replaced with a database query
 const DEMO_USERS = [
   { email: 'volunteer@test.com', password: 'password123', type: 'volunteer' },
   { email: 'org@test.com', password: 'password123', type: 'organization' }
@@ -16,7 +16,6 @@ export async function POST(request: Request) {
   try {
     const body: LoginRequest = await request.json();
     
-    // Validate request body
     if (!body.email || !body.password || !body.userType) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -24,7 +23,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(body.email)) {
       return NextResponse.json(
@@ -33,7 +31,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Find user (in real app, this would be a DB query)
     const user = DEMO_USERS.find(u => 
       u.email === body.email && 
       u.password === body.password &&
@@ -47,7 +44,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // In a real app, we would generate a JWT token here
+    // In a real app, we would generate a JWT token here. We are not because this is only assignment 3.
     return NextResponse.json({
       success: true,
       user: {
