@@ -34,7 +34,7 @@ const events: Event[] = [
 
 const volunteerEvents: Record<string, Event[]> = {};
 
-const VALIDATION = {
+export const VALIDATION = {
   EVENT_NAME_MAX: 100,
   DESC_MAX: 500,
   LOCATION_MAX: 200,
@@ -89,6 +89,14 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!body.eventName || !body.eventDescription || !body.location || 
+      !body.requiredSkills || !body.urgency || !body.eventDate) {
+    return NextResponse.json(
+      { error: 'Missing required fields' },
+      { status: 400 }
+    );
+  }
+
     if (body.eventName.length > VALIDATION.EVENT_NAME_MAX) {
       return NextResponse.json(
         { error: `Event name must be ${VALIDATION.EVENT_NAME_MAX} characters or less` },
@@ -111,13 +119,6 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!body.eventName || !body.eventDescription || !body.location || 
-        !body.requiredSkills || !body.urgency || !body.eventDate) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
-    }
 
     const eventDate = new Date(body.eventDate);
     const today = new Date(VALIDATION.DATE_MIN);
