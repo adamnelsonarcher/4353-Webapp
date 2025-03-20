@@ -70,9 +70,10 @@ export default function VolunteerProfile() {
     availability: [] as Array<{date: string, timeSlots: string[]}>
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-        if (
+    
+    if (
       profile.fullName &&
       profile.address1 &&
       profile.city &&
@@ -81,11 +82,28 @@ export default function VolunteerProfile() {
       profile.skills.length > 0 &&
       profile.availability.length > 0
     ) {
-      localStorage.setItem('volunteerProfile', JSON.stringify(profile));
-      
-      localStorage.removeItem('pendingRegistration');
-      
-      router.push('/volunteer/login');
+      try {
+        const email = localStorage.getItem('pendingRegistration');
+        const response = await fetch('/api/profile', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-email': email || '',
+          },
+          body: JSON.stringify(profile),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.removeItem('pendingRegistration');
+          router.push('/volunteer/login');
+        } else {
+          alert(data.error || 'Failed to save profile');
+        }
+      } catch (error) {
+        alert('An error occurred. Please try again.');
+      }
     } else {
       alert('Please fill in all required fields');
     }

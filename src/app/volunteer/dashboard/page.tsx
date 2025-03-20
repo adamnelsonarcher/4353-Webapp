@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import VolunteerHistory from "./VolunteerHistory";
+import MatchedEvents from "./MatchedEvents";
 import { Button } from "@/components/ui/button";
 
 interface Notification {
@@ -13,28 +14,32 @@ interface Notification {
 
 export default function VolunteerDashboard() {
   const router = useRouter();
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: 1,
-      message: "Notification 1",
-      date: "2024-03-15"
-    },
-    {
-      id: 2,
-      message: "Notification 2",
-      date: "2024-03-14"
-    },
-    {
-      id: 3,
-      message: "Notification 3",
-      date: "2024-03-13"
-    }
-  ]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('volunteerLoggedIn');
     if (!isLoggedIn) {
       router.push('/volunteer/login');
+    } else {
+      const fetchNotifications = async () => {
+        try {
+          const email = localStorage.getItem('userEmail');
+          const response = await fetch('/api/notifications', {
+            headers: {
+              'x-user-email': email || ''
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setNotifications(data);
+          }
+        } catch (error) {
+          console.error('Failed to fetch notifications:', error);
+        }
+      };
+
+      fetchNotifications();
     }
   }, [router]);
 
@@ -54,40 +59,29 @@ export default function VolunteerDashboard() {
             Logout
           </Button>
         </div>
-        
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-6">
-          <div className="feature-card">
-            <h2 className="text-xl font-semibold mb-4">Notifications</h2>
-            <div className="space-y-2 overflow-y-auto max-h-[120px]">
-              {notifications.map((notification) => (
-                <div 
-                  key={notification.id}
-                  className="p-2 rounded-lg hover:bg-secondary/5 transition-colors cursor-pointer"
-                >
-                  <p className="text-secondary-foreground">{notification.message}</p>
-                  <p className="text-xs text-secondary-foreground/70">{new Date(notification.date).toLocaleDateString()}</p>
-                </div>
-              ))}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Left column */}
+          <div className="space-y-8">
+            <MatchedEvents />
+            <div className="feature-card">
+              <h2 className="text-xl font-semibold mb-6">Notifications</h2>
+              <div className="space-y-4">
+                {notifications.map(notification => (
+                  <div key={notification.id} className="p-4 border border-secondary rounded-lg">
+                    <p className="text-sm text-muted-foreground">{notification.message}</p>
+                    <p className="text-xs text-muted-foreground mt-2">{notification.date}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-          
-          <div className="feature-card">
-            <h2 className="text-xl font-semibold mb-4">My Events</h2>
-            <p className="text-secondary-foreground">No upcoming events</p>
-          </div>
-          
-          <div className="feature-card">
-            <h2 className="text-xl font-semibold mb-4">My Skills</h2>
-            <p className="text-secondary-foreground">No skills added</p>
-          </div>
-          
-          <div className="feature-card">
-            <h2 className="text-xl font-semibold mb-4">My Availability</h2>
-            <p className="text-secondary-foreground">No availability set</p>
+
+          {/* Right column */}
+          <div className="space-y-8">
+            <VolunteerHistory />
           </div>
         </div>
-
-        <VolunteerHistory />
       </div>
     </div>
   );

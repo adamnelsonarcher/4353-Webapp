@@ -16,55 +16,25 @@ const VolunteerHistory = () => {
   const [history, setHistory] = useState<VolunteerHistoryEntry[]>([]);
 
   useEffect(() => {
-    const storedHistory = localStorage.getItem("volunteerHistory");
-    if (storedHistory) {
-      setHistory(JSON.parse(storedHistory));
-    } else {
-      const demoData: VolunteerHistoryEntry[] = [
-        {
-          eventName: "Houston Food Bank",
-          eventDescription:
-            "To provide food assistance to those in need and alleviate hunger in the community.",
-          location: "535 Portwall St, Houston, TX 77029",
-          requiredSkills: "Lift Heavy Objects, Stand",
-          urgency: "Medium",
-          eventDate: "03/11/2024",
-          status: "Participated",
-        },
-        {
-          eventName: "Homeless Shelter",
-          eventDescription:
-            "Providing meals, shelter, and support services for individuals experiencing homelessness.",
-          location: "101 Homeless Way, Houston, TX 77001",
-          requiredSkills: "Empathy, Teamwork, Basic Problem-Solving",
-          urgency: "High",
-          eventDate: "04/04/2024",
-          status: "Participated",
-        },
-        {
-          eventName: "Public Library",
-          eventDescription:
-            "Hosting a reading event for children in the community to promote literacy and education.",
-          location: "4500 Library Ln, Houston, TX 77002",
-          requiredSkills: "Communication, Patience, Working with Children",
-          urgency: "Low",
-          eventDate: "04/19/2024",
-          status: "Canceled",
-        },
-        {
-          eventName: "Blood Drive",
-          eventDescription:
-            "Organizing a blood donation drive to support local hospitals and medial facilities.",
-          location: "500 Donation Dr., Houston, TX 77003",
-          requiredSkills: "Organization, Attention to Detail",
-          urgency: "High",
-          eventDate: "4/30/2024",
-          status: "No Show",
-        },
-      ];
-      localStorage.setItem("volunteerHistory", JSON.stringify(demoData));
-      setHistory(demoData);
-    }
+    const fetchHistory = async () => {
+      try {
+        const email = localStorage.getItem('userEmail');
+        const response = await fetch('/api/events?type=history', {
+          headers: {
+            'x-user-email': email || ''
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setHistory(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch history:', error);
+      }
+    };
+
+    fetchHistory();
   }, []);
 
   const formatDate = (dateString: string) => {

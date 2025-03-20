@@ -12,16 +12,33 @@ export default function VolunteerLogin() {
   });
   const [emailError, setEmailError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setEmailError('Please enter a valid email');
-      return;
-    }
-    if (formData.password.length >= 6) {
-      localStorage.setItem('volunteerLoggedIn', 'true');
-      router.push('/volunteer/dashboard');
+  
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          userType: 'volunteer'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('volunteerLoggedIn', 'true');
+        localStorage.setItem('userEmail', formData.email);
+        router.push('/volunteer/dashboard');
+      } else {
+        setEmailError(data.error);
+      }
+    } catch (error) {
+      setEmailError('An error occurred. Please try again.');
     }
   };
 
@@ -36,7 +53,7 @@ export default function VolunteerLogin() {
         <div className="form-container">
           {/* Test Notice */}
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
-            Because this is just a frontend test, enter any email in the email section and anything in the password to get taken to the dashboard.
+            This is assignment 3, the database is not yet created. Enter any valid email and some password, and you will be let in to the generic account page. 
           </div>
 
           <div className="mb-8">
