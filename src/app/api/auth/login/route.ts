@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
-import { db } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
 interface LoginRequest {
@@ -63,17 +62,40 @@ export async function POST(request: Request) {
     });
 
   } catch (error: any) {
-    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      );
-    }
-
     console.error('Login error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    
+    // Firebase Auth specific errors
+    switch (error.code) {
+      case 'auth/user-not-found':
+        return NextResponse.json(
+          { error: 'No account found with this email' },
+          { status: 401 }
+        );
+      case 'auth/wrong-password':
+        return NextResponse.json(
+          { error: 'Incorrect password' },
+          { status: 401 }
+        );
+      case 'auth/invalid-email':
+        return NextResponse.json(
+          { error: 'Invalid email format' },
+          { status: 400 }
+        );
+      case 'auth/user-disabled':
+        return NextResponse.json(
+          { error: 'This account has been disabled' },
+          { status: 401 }
+        );
+      case 'auth/too-many-requests':
+        return NextResponse.json(
+          { error: 'Too many failed attempts. Please try again later' },
+          { status: 429 }
+        );
+      default:
+        return NextResponse.json(
+          { error: 'Failed to sign in. Please try again.' },
+          { status: 500 }
+        );
+    }
   }
 } 

@@ -87,15 +87,34 @@ export async function POST(request: Request) {
 
   } catch (error: any) {
     console.error('Registration error:', error);
-    if (error.code === 'auth/email-already-in-use') {
-      return NextResponse.json(
-        { error: 'Email already in use' },
-        { status: 400 }
-      );
+    
+    // Firebase Auth specific errors
+    switch (error.code) {
+      case 'auth/email-already-in-use':
+        return NextResponse.json(
+          { error: 'This email is already registered' },
+          { status: 400 }
+        );
+      case 'auth/invalid-email':
+        return NextResponse.json(
+          { error: 'Invalid email format' },
+          { status: 400 }
+        );
+      case 'auth/operation-not-allowed':
+        return NextResponse.json(
+          { error: 'Email/password registration is not enabled' },
+          { status: 400 }
+        );
+      case 'auth/weak-password':
+        return NextResponse.json(
+          { error: 'Password is too weak. It must be at least 8 characters long' },
+          { status: 400 }
+        );
+      default:
+        return NextResponse.json(
+          { error: 'Failed to create account. Please try again.' },
+          { status: 500 }
+        );
     }
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
   }
 } 
