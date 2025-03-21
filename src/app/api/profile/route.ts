@@ -42,7 +42,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Find the profile document
     const profilesRef = collection(db, 'profiles');
     const q = query(profilesRef, where('email', '==', email));
     const querySnapshot = await getDocs(q);
@@ -85,7 +84,6 @@ export async function GET(request: Request) {
       );
     }
 
-    // Find the profile document
     const profilesRef = collection(db, 'profiles');
     const q = query(profilesRef, where('email', '==', email));
     const querySnapshot = await getDocs(q);

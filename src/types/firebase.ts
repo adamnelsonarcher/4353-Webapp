@@ -37,7 +37,11 @@ export interface FirebaseEvent {
 export interface FirebaseVolunteerHistory {
   volunteerId: string;
   eventId: string;
+  eventName: string;
+  participationDate: Date;
   status: 'Pending' | 'Participated' | 'Canceled' | 'No Show';
   createdAt: Date;
   updatedAt: Date;
+  feedback?: string;
+  hours?: number;
 } 
