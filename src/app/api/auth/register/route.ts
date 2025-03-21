@@ -1,15 +1,13 @@
 import { NextResponse } from 'next/server';
-import { createUser } from '@/lib/firebase-utils';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, db } from '@/lib/firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
 interface RegistrationRequest {
   email: string;
   password: string;
   userType: 'volunteer' | 'organization';
 }
-
-const registeredUsers: RegistrationRequest[] = [];
 
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -47,13 +45,6 @@ export async function POST(request: Request) {
       );
     }
 
-    if (registeredUsers.some(user => user.email === body.email)) {
-      return NextResponse.json(
-        { error: 'Email already registered' },
-        { status: 409 }
-      );
-    }
-
     // Create user in Firebase Authentication
     const userCredential = await createUserWithEmailAndPassword(
       auth,
@@ -62,13 +53,29 @@ export async function POST(request: Request) {
     );
 
     // Create user document in Firestore
-    await createUser({
+    const userCollection = collection(db, 'users');
+    await addDoc(userCollection, {
       email: body.email,
       userType: body.userType,
-      password: '' // We don't store the password in Firestore as it's handled by Firebase Auth
+      createdAt: new Date()
     });
 
-    registeredUsers.push(body);
+    // Create empty profile document
+    const profileCollection = collection(db, 'profiles');
+    await addDoc(profileCollection, {
+      email: body.email,
+      fullName: '',
+      address1: '',
+      address2: '',
+      city: '',
+      state: '',
+      zipCode: '',
+      skills: [],
+      preferences: '',
+      availability: [],
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
 
     return NextResponse.json({
       success: true,
@@ -79,14 +86,13 @@ export async function POST(request: Request) {
     });
 
   } catch (error: any) {
+    console.error('Registration error:', error);
     if (error.code === 'auth/email-already-in-use') {
       return NextResponse.json(
         { error: 'Email already in use' },
         { status: 400 }
       );
     }
-
-    console.error('Registration error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

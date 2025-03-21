@@ -1,12 +1,8 @@
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import { getAuth } from 'firebase-admin/auth';
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
-// For client-side
-import { initializeApp as initializeClientApp } from 'firebase/app';
-import { getAuth as getClientAuth } from 'firebase/auth';
-import { getFirestore as getClientFirestore } from 'firebase/firestore';
-
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -17,25 +13,11 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase Admin (server-side)
-const apps = getApps();
-const adminApp = apps.length === 0 
-  ? initializeApp({
-      credential: cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      }),
-    }) 
-  : apps[0];
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase Client (client-side)
-const clientApp = initializeClientApp(firebaseConfig);
+// Get Auth and Firestore instances
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-// Export admin instances
-export const adminDb = getFirestore(adminApp);
-export const adminAuth = getAuth(adminApp);
-
-// Export client instances
-export const auth = getClientAuth(clientApp);
-export const db = getClientFirestore(clientApp); 
+export { auth, db }; 
