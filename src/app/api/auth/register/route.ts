@@ -31,12 +31,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!PASSWORD_REGEX.test(body.password)) {
-      return NextResponse.json(
-        { error: 'Password must be at least 8 characters and contain both letters and numbers' },
-        { status: 400 }
-      );
-    }
+    
 
     if (!['volunteer', 'organization'].includes(body.userType)) {
       return NextResponse.json(

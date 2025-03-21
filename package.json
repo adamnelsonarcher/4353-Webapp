@@ -18,7 +18,7 @@
     "4353-webapp": "file:",
     "firebase": "^11.5.0",
     "firebase-admin": "^13.2.0",
-    "next": "15.1.6",
+    "next": "^15.1.6",
     "next-auth": "^4.24.11",
     "prisma": "^6.3.1",
     "react": "^19.0.0",
