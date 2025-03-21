@@ -19,6 +19,7 @@ States: Stores state codes and names (if required).
 Important Deliverables
 Validations: Ensure validations are in place for required fields, field types, and field lengths.
 Data Retrieval and Display: Backend should retrieve data from the database and display it to the front end.
+
 Data Persistence: Form data should be populated from the backend. The backend should receive data from the front end, validate it, and persist it to the database.
 Unit Tests: Any new code added should be covered by unit tests. Keep code coverage above 80%.
 Pointers/Guidelines for Choosing a Database
@@ -30,18 +31,34 @@ Drawbacks: Requires schema definition, less flexible with unstructured data.
 NoSQL: If you choose a NoSQL database, consider using MongoDB or Firebase. These databases are great for unstructured data and flexible schemas.
 
 Example: MongoDB, Firebase
+
 Benefits: Flexible schema, easy scalability, and handling unstructured data.
+
 Drawbacks: Less suitable for complex queries and transactions.
+
 Submission Requirements
+
 Submit a Word/PDF document with your answers.
+
 Use GitHub for your group collaboration and code.
+
 Answer these Questions:
+
 GitHub Repository Link (5 points)
+
 Provide the link to your GitHub repository for TAs to view the code. Code should include unit tests.
+
 SQL Statements (RDBMS) or Document Structure (NoSQL) (3 points)
+
 Provide SQL statements to create the database (if using RDBMS).
+
 Provide Document Structure or Class Models if using NoSQL.
+
 Code Coverage Report (2 points)
+
 Rerun the code coverage report and provide it.
+
 Team Contributions (3 points)
-List who did what within the group. TAs should be able to validate in GitHub; otherwise, team members who didn't contribute will receive a ZERO.
+
+List who did what within the group. TAs should be able to validate in GitHub; otherwise, team members 
+who didn't contribute will receive a ZERO.
