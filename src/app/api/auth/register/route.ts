@@ -1,4 +1,7 @@
 import { NextResponse } from 'next/server';
+import { createUser } from '@/lib/firebase-utils';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 interface RegistrationRequest {
   email: string;
@@ -8,10 +11,14 @@ interface RegistrationRequest {
 
 const registeredUsers: RegistrationRequest[] = [];
 
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function POST(request: Request) {
   try {
     const body: RegistrationRequest = await request.json();
-
+    
+    // Validation
     if (!body.email || !body.password || !body.userType) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -19,17 +26,23 @@ export async function POST(request: Request) {
       );
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(body.email)) {
+    if (!EMAIL_REGEX.test(body.email)) {
       return NextResponse.json(
         { error: 'Invalid email format' },
         { status: 400 }
       );
     }
 
-    if (body.password.length < 8) {
+    if (!PASSWORD_REGEX.test(body.password)) {
       return NextResponse.json(
-        { error: 'Password must be at least 8 characters long' },
+        { error: 'Password must be at least 8 characters and contain both letters and numbers' },
+        { status: 400 }
+      );
+    }
+
+    if (!['volunteer', 'organization'].includes(body.userType)) {
+      return NextResponse.json(
+        { error: 'Invalid user type' },
         { status: 400 }
       );
     }
@@ -41,13 +54,39 @@ export async function POST(request: Request) {
       );
     }
 
+    // Create user in Firebase Authentication
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      body.email,
+      body.password
+    );
+
+    // Create user document in Firestore
+    await createUser({
+      email: body.email,
+      userType: body.userType,
+      password: '' // We don't store the password in Firestore as it's handled by Firebase Auth
+    });
+
     registeredUsers.push(body);
 
     return NextResponse.json({
       success: true,
-      message: 'Registration successful'
+      user: {
+        email: userCredential.user.email,
+        type: body.userType
+      }
     });
-  } catch (error) {
+
+  } catch (error: any) {
+    if (error.code === 'auth/email-already-in-use') {
+      return NextResponse.json(
+        { error: 'Email already in use' },
+        { status: 400 }
+      );
+    }
+
+    console.error('Registration error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

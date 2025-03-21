@@ -36,7 +36,7 @@ export default function OrganizationLogin() {
         <div className="form-container">
           {/* Test Notice */}
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
-            This is assignment 3, the database is not yet created. Enter any valid email and some password, and you will be let in to the generic account page. 
+            For assignment 4, we now can create accounts and login. 
           </div>
 
           {/* Back Button */}

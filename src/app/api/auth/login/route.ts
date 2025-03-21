@@ -1,4 +1,8 @@
 import { NextResponse } from 'next/server';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 interface LoginRequest {
   email: string;
@@ -23,36 +27,50 @@ export async function POST(request: Request) {
       );
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(body.email)) {
+    // Sign in with Firebase Auth
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      body.email,
+      body.password
+    );
+
+    // Verify user type matches
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('email', '==', body.email));
+    const querySnapshot = await getDocs(q);
+    
+    if (querySnapshot.empty) {
       return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
+        { error: 'User not found' },
+        { status: 404 }
       );
     }
 
-    const user = DEMO_USERS.find(u => 
-      u.email === body.email && 
-      u.password === body.password &&
-      u.type === body.userType
-    );
+    const userData = querySnapshot.docs[0].data();
+    if (userData.userType !== body.userType) {
+      return NextResponse.json(
+        { error: 'Invalid user type' },
+        { status: 401 }
+      );
+    }
 
-    if (!user) {
+    return NextResponse.json({
+      success: true,
+      user: {
+        email: userCredential.user.email,
+        type: userData.userType
+      }
+    });
+
+  } catch (error: any) {
+    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
 
-    // In a real app, we would generate a JWT token here. We are not because this is only assignment 3.
-    return NextResponse.json({
-      success: true,
-      user: {
-        email: user.email,
-        type: user.type
-      }
-    });
-  } catch (error) {
+    console.error('Login error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
