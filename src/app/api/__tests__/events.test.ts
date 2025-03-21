@@ -1,9 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { POST, GET, VALIDATION } from '../events/route';
+import { POST, GET } from '../events/route';
+
+// Declare global events array
+declare global {
+  var events: any[];
+}
 
 describe('Events API', () => {
   beforeEach(() => {
-    // Reset test data before each test
+    // Reset global events array before each test
     global.events = [];
   });
 
@@ -14,14 +19,14 @@ describe('Events API', () => {
       location: 'Valid Location, 123',
       requiredSkills: ['Leadership', 'Communication'],
       urgency: 'Medium',
-      eventDate: new Date().toISOString().split('T')[0]
+      eventDate: new Date().toISOString().split('T')[0],
     };
 
     it('should require authentication', async () => {
       const request = new Request('http://localhost:3000/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(baseEvent)
+        body: JSON.stringify(baseEvent),
       });
 
       const response = await POST(request);
@@ -33,12 +38,12 @@ describe('Events API', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': 'test@example.com'
+          'x-user-email': 'test@example.com',
         },
         body: JSON.stringify({
           ...baseEvent,
-          eventName: 'A'.repeat(101)
-        })
+          eventName: 'A'.repeat(101), // Name too long
+        }),
       });
 
       const response = await POST(request);
@@ -52,12 +57,12 @@ describe('Events API', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': 'test@example.com'
+          'x-user-email': 'test@example.com',
         },
         body: JSON.stringify({
           ...baseEvent,
-          requiredSkills: ['Invalid Skill']
-        })
+          requiredSkills: ['Invalid Skill'], // Invalid skill
+        }),
       });
 
       const response = await POST(request);
@@ -71,12 +76,12 @@ describe('Events API', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': 'test@example.com'
+          'x-user-email': 'test@example.com',
         },
         body: JSON.stringify({
           ...baseEvent,
-          urgency: 'Invalid'
-        })
+          urgency: 'Invalid', // Invalid urgency
+        }),
       });
 
       const response = await POST(request);
@@ -90,14 +95,13 @@ describe('Events API', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': 'test@example.com'
+          'x-user-email': 'test@example.com',
         },
         body: JSON.stringify({
-          eventName: 'Test Event'
-          // Missing other required fields
-        })
+          eventName: 'Test Event', // Missing other required fields
+        }),
       });
-
+    
       const response = await POST(request);
       const data = await response.json();
       expect(response.status).toBe(400);
@@ -106,18 +110,18 @@ describe('Events API', () => {
 
     it('should validate event date is not in the past', async () => {
       const pastDate = new Date();
-      pastDate.setDate(pastDate.getDate() - 1);
-      
+      pastDate.setDate(pastDate.getDate() - 1); // Set date to yesterday
+
       const request = new Request('http://localhost:3000/api/events', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': 'test@example.com'
+          'x-user-email': 'test@example.com',
         },
         body: JSON.stringify({
           ...baseEvent,
-          eventDate: pastDate.toISOString().split('T')[0]
-        })
+          eventDate: pastDate.toISOString().split('T')[0], // Past date
+        }),
       });
 
       const response = await POST(request);
@@ -126,20 +130,20 @@ describe('Events API', () => {
       expect(data.error).toBe('Event date cannot be in the past');
     });
 
-    it('should validate event date is not too far in future', async () => {
+    it('should validate event date is not too far in the future', async () => {
       const farFutureDate = new Date();
-      farFutureDate.setFullYear(farFutureDate.getFullYear() + 2);
-      
+      farFutureDate.setFullYear(farFutureDate.getFullYear() + 2); // Set date 2 years in the future
+
       const request = new Request('http://localhost:3000/api/events', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': 'test@example.com'
+          'x-user-email': 'test@example.com',
         },
         body: JSON.stringify({
           ...baseEvent,
-          eventDate: farFutureDate.toISOString().split('T')[0]
-        })
+          eventDate: farFutureDate.toISOString().split('T')[0], // Far future date
+        }),
       });
 
       const response = await POST(request);
@@ -153,12 +157,12 @@ describe('Events API', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': 'test@example.com'
+          'x-user-email': 'test@example.com',
         },
         body: JSON.stringify({
           ...baseEvent,
-          requiredSkills: ['Leadership', 'Communication', 'Problem-Solving', 'Teaching', 'Cooking', 'Coding']
-        })
+          requiredSkills: ['Leadership', 'Communication', 'Problem-Solving', 'Teaching', 'Cooking', 'Coding'], // Too many skills
+        }),
       });
 
       const response = await POST(request);
@@ -172,12 +176,12 @@ describe('Events API', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': 'test@example.com'
+          'x-user-email': 'test@example.com',
         },
         body: JSON.stringify({
           ...baseEvent,
-          location: 'Invalid Location @#$%'
-        })
+          location: 'Invalid Location @#$%', // Invalid location format
+        }),
       });
 
       const response = await POST(request);
@@ -191,12 +195,12 @@ describe('Events API', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': 'test@example.com'
+          'x-user-email': 'test@example.com',
         },
         body: JSON.stringify({
           ...baseEvent,
-          eventDescription: 'Too short description'
-        })
+          eventDescription: 'Too short', // Too few words
+        }),
       });
 
       const response = await POST(request);
@@ -210,9 +214,9 @@ describe('Events API', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': 'test@example.com'
+          'x-user-email': 'test@example.com',
         },
-        body: JSON.stringify(baseEvent)
+        body: JSON.stringify(baseEvent),
       });
 
       const response = await POST(request);
@@ -234,8 +238,8 @@ describe('Events API', () => {
     it('should return all events for authenticated user', async () => {
       const request = new Request('http://localhost:3000/api/events', {
         headers: {
-          'x-user-email': 'test@example.com'
-        }
+          'x-user-email': 'test@example.com',
+        },
       });
 
       const response = await GET(request);
@@ -247,8 +251,8 @@ describe('Events API', () => {
     it('should return volunteer history when type=history', async () => {
       const request = new Request('http://localhost:3000/api/events?type=history', {
         headers: {
-          'x-user-email': 'test@example.com'
-        }
+          'x-user-email': 'test@example.com',
+        },
       });
 
       const response = await GET(request);

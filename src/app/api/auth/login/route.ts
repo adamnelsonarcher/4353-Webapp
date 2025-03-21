@@ -16,6 +16,7 @@ export async function POST(request: Request) {
   try {
     const body: LoginRequest = await request.json();
     
+    // Validate required fields
     if (!body.email || !body.password || !body.userType) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -23,6 +24,7 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(body.email)) {
       return NextResponse.json(
@@ -31,12 +33,14 @@ export async function POST(request: Request) {
       );
     }
 
+    // Find user in the demo database
     const user = DEMO_USERS.find(u => 
       u.email === body.email && 
       u.password === body.password &&
       u.type === body.userType
     );
 
+    // Return 401 if user is not found
     if (!user) {
       return NextResponse.json(
         { error: 'Invalid credentials' },
@@ -44,18 +48,22 @@ export async function POST(request: Request) {
       );
     }
 
-    // In a real app, we would generate a JWT token here. We are not because this is only assignment 3.
-    return NextResponse.json({
-      success: true,
-      user: {
-        email: user.email,
-        type: user.type
-      }
-    });
+    // Return success response with a mock token
+    return NextResponse.json(
+      { 
+        success: true,
+        token: 'fake-jwt-token', // Mock token for testing
+        user: {
+          email: user.email,
+          type: user.type
+        }
+      },
+      { status: 200 }
+    );
   } catch (error) {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
-} 
+}
