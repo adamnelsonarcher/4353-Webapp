@@ -16,6 +16,8 @@
     "@heroicons/react": "^2.2.0",
     "@prisma/client": "^6.3.1",
     "4353-webapp": "file:",
+    "firebase": "^11.5.0",
+    "firebase-admin": "^13.2.0",
     "next": "15.1.6",
     "next-auth": "^4.24.11",
     "prisma": "^6.3.1",
@@ -25,6 +27,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@types/firebase": "^3.2.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
