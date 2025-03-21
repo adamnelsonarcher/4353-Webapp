@@ -45,14 +45,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create user in Firebase Authentication
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       body.email,
       body.password
     );
 
-    // Create user document in Firestore
     const userCollection = collection(db, 'users');
     await addDoc(userCollection, {
       email: body.email,
@@ -60,7 +58,6 @@ export async function POST(request: Request) {
       createdAt: new Date()
     });
 
-    // Create empty profile document
     const profileCollection = collection(db, 'profiles');
     await addDoc(profileCollection, {
       email: body.email,

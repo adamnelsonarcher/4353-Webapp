@@ -94,7 +94,6 @@ describe('Events API', () => {
         },
         body: JSON.stringify({
           eventName: 'Test Event'
-          // Missing other required fields
         })
       });
 
