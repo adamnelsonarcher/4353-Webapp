@@ -75,23 +75,36 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
-  const email = request.headers.get('x-user-email');
+  try {
+    const email = request.headers.get('x-user-email');
 
-  if (!email) {
+    if (!email) {
+      return NextResponse.json(
+        { error: 'User not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    // Find the profile document
+    const profilesRef = collection(db, 'profiles');
+    const q = query(profilesRef, where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return NextResponse.json(
+        { error: 'Profile not found' },
+        { status: 404 }
+      );
+    }
+
+    const profileData = querySnapshot.docs[0].data();
+    return NextResponse.json(profileData);
+    
+  } catch (error) {
+    console.error('Profile fetch error:', error);
     return NextResponse.json(
-      { error: 'User not authenticated' },
-      { status: 401 }
+      { error: 'Failed to fetch profile' },
+      { status: 500 }
     );
   }
-
-  const profile = profileStore[email];
-  
-  if (!profile) {
-    return NextResponse.json(
-      { error: 'Profile not found' },
-      { status: 404 }
-    );
-  }
-
-  return NextResponse.json(profile);
 } 
