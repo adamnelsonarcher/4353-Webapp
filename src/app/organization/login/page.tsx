@@ -10,24 +10,46 @@ export default function OrganizationLogin() {
     email: '',
     password: ''
   });
-  const [emailError, setEmailError] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setEmailError('Please enter a valid email');
-      return;
-    }
-    if (formData.password.length >= 6) {
-      localStorage.setItem('organizationLoggedIn', 'true');
-      router.push('/organization/dashboard');
+    setError('');
+    
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          userType: 'organization'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('organizationLoggedIn', 'true');
+        localStorage.setItem('userEmail', formData.email);
+        router.push('/organization/dashboard');
+      } else {
+        setError(data.error);
+      }
+    } catch (error) {
+      setError('An error occurred. Please try again.');
     }
   };
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({...formData, email: e.target.value});
-    setEmailError(''); // Clear error when user starts typing
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setError('');
   };
 
   return (
@@ -36,7 +58,7 @@ export default function OrganizationLogin() {
         <div className="form-container">
           {/* Test Notice */}
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
-            For assignment 4, we now can create accounts and login. 
+            For assignment 4, we now can create accounts and login. You can create your own account, or use this one []
           </div>
 
           {/* Back Button */}
@@ -62,14 +84,12 @@ export default function OrganizationLogin() {
               <input
                 type="email"
                 id="email"
-                className={`form-input ${emailError ? 'border-red-500' : ''}`}
+                name="email"
+                className={`form-input ${error ? 'border-red-500' : ''}`}
                 placeholder="Enter organization email"
                 value={formData.email}
-                onChange={handleEmailChange}
+                onChange={handleChange}
               />
-              {emailError && (
-                <p className="text-red-500 text-sm mt-1">{emailError}</p>
-              )}
             </div>
             
             <div>
@@ -79,12 +99,17 @@ export default function OrganizationLogin() {
               <input
                 type="password"
                 id="password"
-                className="form-input"
+                name="password"
+                className={`form-input ${error ? 'border-red-500' : ''}`}
                 placeholder="Enter password"
                 value={formData.password}
-                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                onChange={handleChange}
               />
             </div>
+
+            {error && (
+              <p className="text-red-500 text-sm mt-1">{error}</p>
+            )}
             
             <Button 
               type="submit" 

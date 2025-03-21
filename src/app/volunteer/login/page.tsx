@@ -53,7 +53,7 @@ export default function VolunteerLogin() {
         <div className="form-container">
           {/* Test Notice */}
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
-          For assignment 4, we now can create accounts and login.
+          For assignment 4, we now can create accounts and login. You can create your own account, or use this one [test12@test.com, Password1]
           </div>
 
           <div className="mb-8">
