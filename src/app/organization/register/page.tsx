@@ -1,6 +1,76 @@
+'use client';
+
 import { Button } from "@/components/ui/button";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function OrganizationRegistration() {
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    orgName: '',
+    email: '',
+    phone: '',
+    address: '',
+    password: '',
+    confirmPassword: '',
+    description: ''
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          userType: 'organization',
+          orgName: formData.orgName,
+          phone: formData.phone,
+          address: formData.address,
+          description: formData.description
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('organizationLoggedIn', 'true');
+        localStorage.setItem('organizationEmail', formData.email);
+        router.push('/organization/dashboard');
+      } else {
+        setError(data.error || 'Registration failed');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setError('An error occurred during registration');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="container-page">
       <div className="container-centered">
@@ -19,7 +89,7 @@ export default function OrganizationRegistration() {
           </div>
 
           <h1 className="heading-primary">Organization Registration</h1>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="orgName" className="form-label">
                 Organization Name
@@ -29,6 +99,8 @@ export default function OrganizationRegistration() {
                 id="orgName"
                 className="form-input"
                 placeholder="Enter organization name"
+                value={formData.orgName}
+                onChange={handleChange}
               />
             </div>
 
@@ -41,6 +113,8 @@ export default function OrganizationRegistration() {
                 id="email"
                 className="form-input"
                 placeholder="Enter organization email"
+                value={formData.email}
+                onChange={handleChange}
               />
             </div>
 
@@ -53,6 +127,8 @@ export default function OrganizationRegistration() {
                 id="phone"
                 className="form-input"
                 placeholder="Enter contact number"
+                value={formData.phone}
+                onChange={handleChange}
               />
             </div>
 
@@ -65,6 +141,8 @@ export default function OrganizationRegistration() {
                 id="address"
                 className="form-input"
                 placeholder="Enter organization address"
+                value={formData.address}
+                onChange={handleChange}
               />
             </div>
 
@@ -77,6 +155,8 @@ export default function OrganizationRegistration() {
                 id="password"
                 className="form-input"
                 placeholder="Choose a password"
+                value={formData.password}
+                onChange={handleChange}
               />
             </div>
 
@@ -89,6 +169,8 @@ export default function OrganizationRegistration() {
                 id="confirmPassword"
                 className="form-input"
                 placeholder="Confirm your password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
               />
             </div>
 
@@ -101,11 +183,13 @@ export default function OrganizationRegistration() {
                 rows={4}
                 className="form-input"
                 placeholder="Brief description of your organization"
+                value={formData.description}
+                onChange={handleChange}
               />
             </div>
 
-            <Button type="submit" variant="primary" className="w-full hover:opacity-90 transition-opacity">
-              Register Organization
+            <Button type="submit" variant="primary" className="w-full hover:opacity-90 transition-opacity" disabled={loading}>
+              {loading ? 'Registering...' : 'Register Organization'}
             </Button>
           </form>
 

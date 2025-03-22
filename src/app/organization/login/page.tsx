@@ -11,10 +11,12 @@ export default function OrganizationLogin() {
     password: ''
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     
     try {
       const response = await fetch('/api/auth/login', {
@@ -30,16 +32,20 @@ export default function OrganizationLogin() {
       });
 
       const data = await response.json();
+      console.log('Login response:', data);
 
       if (response.ok) {
         localStorage.setItem('organizationLoggedIn', 'true');
-        localStorage.setItem('userEmail', formData.email);
+        localStorage.setItem('organizationEmail', formData.email);
         router.push('/organization/dashboard');
       } else {
-        setError(data.error);
+        setError(data.error || 'Login failed');
       }
     } catch (error) {
+      console.error('Login error:', error);
       setError('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 

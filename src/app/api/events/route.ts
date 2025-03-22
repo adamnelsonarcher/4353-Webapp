@@ -1,4 +1,7 @@
 import { NextResponse } from 'next/server';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, query, where, getDocs, Timestamp } from 'firebase/firestore';
+import type { FirebaseEvent } from '@/types/firebase';
 
 interface Event {
   id: string;
@@ -39,48 +42,23 @@ const VALIDATION = {
   DESC_MAX: 500,
   LOCATION_MAX: 200,
   VALID_SKILLS: [
-    "Leadership",
-    "Communication",
-    "Problem-Solving",
-    "Teaching",
-    "Cooking",
-    "Coding",
-    "Lift Heavy Objects",
-    "Stand",
-    "Empathy",
-    "Teamwork"
+    "Leadership", "Communication", "Problem-Solving", "Teaching",
+    "Cooking", "Coding", "Lift Heavy Objects", "Stand",
+    "Empathy", "Teamwork"
   ],
   VALID_URGENCY: ["Low", "Medium", "High"],
   DATE_MIN: new Date().toISOString().split('T')[0], // Today
   DATE_MAX: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year from now
   MIN_SKILLS: 1,
   MAX_SKILLS: 5,
-  LOCATION_PATTERN: /^[A-Za-z0-9\s,.-]+$/, 
+  LOCATION_PATTERN: /^[A-Za-z0-9\s,.-]+$/,
 };
 
 export async function GET(request: Request) {
-  const email = request.headers.get('x-user-email');
-  const searchParams = new URL(request.url).searchParams;
-  const type = searchParams.get('type'); 
-
-  if (!email) {
-    return NextResponse.json(
-      { error: 'User not authenticated' },
-      { status: 401 }
-    );
-  }
-
-  if (type === 'history') {
-    return NextResponse.json(volunteerEvents[email] || []);
-  }
-
-  return NextResponse.json(events);
-}
-
-export async function POST(request: Request) {
   try {
-    const body = await request.json();
     const email = request.headers.get('x-user-email');
+    const searchParams = new URL(request.url).searchParams;
+    const type = searchParams.get('type');
 
     if (!email) {
       return NextResponse.json(
@@ -89,7 +67,52 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check required fields first
+    const eventsRef = collection(db, 'events');
+    let q;
+
+    if (type === 'organization') {
+      // Get events created by this organization
+      q = query(eventsRef, where('organizerEmail', '==', email));
+    } else {
+      // Get all active events for volunteers
+      q = query(eventsRef, where('status', '==', 'Active'));
+    }
+
+    const querySnapshot = await getDocs(q);
+    const events = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate?.() || null,
+        updatedAt: data.updatedAt?.toDate?.() || null
+      };
+    });
+
+    return NextResponse.json(events);
+
+  } catch (error) {
+    console.error('Events fetch error:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch events' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const email = request.headers.get('x-user-email');
+    const body = await request.json();
+
+    if (!email) {
+      return NextResponse.json(
+        { error: 'User not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    // Validate required fields
     if (!body.eventName || !body.eventDescription || !body.location || 
         !body.requiredSkills || !body.urgency || !body.eventDate) {
       return NextResponse.json(
@@ -98,83 +121,51 @@ export async function POST(request: Request) {
       );
     }
 
-    // Then proceed with other validations
-    if (body.eventName.length > VALIDATION.EVENT_NAME_MAX) {
+    // Validate field lengths
+    if (body.eventName.length > VALIDATION.EVENT_NAME_MAX ||
+        body.eventDescription.length > VALIDATION.DESC_MAX ||
+        body.location.length > VALIDATION.LOCATION_MAX) {
       return NextResponse.json(
-        { error: `Event name must be ${VALIDATION.EVENT_NAME_MAX} characters or less` },
+        { error: 'Field length exceeded maximum allowed' },
         { status: 400 }
       );
     }
 
+    // Validate skills
     if (!body.requiredSkills.every((skill: string) => 
-      VALIDATION.VALID_SKILLS.includes(skill))) {
+        VALIDATION.VALID_SKILLS.includes(skill))) {
       return NextResponse.json(
         { error: 'Invalid skills provided' },
         { status: 400 }
       );
     }
 
-    if (!VALIDATION.VALID_URGENCY.includes(body.urgency)) {
-      return NextResponse.json(
-        { error: 'Invalid urgency level' },
-        { status: 400 }
-      );
-    }
-
-    const eventDate = new Date(body.eventDate);
-    const today = new Date(VALIDATION.DATE_MIN);
-    const maxDate = new Date(VALIDATION.DATE_MAX);
-
-    if (eventDate < today) {
-      return NextResponse.json(
-        { error: 'Event date cannot be in the past' },
-        { status: 400 }
-      );
-    }
-
-    if (eventDate > maxDate) {
-      return NextResponse.json(
-        { error: 'Event date cannot be more than 1 year in the future' },
-        { status: 400 }
-      );
-    }
-
-    if (body.requiredSkills.length < VALIDATION.MIN_SKILLS || 
-        body.requiredSkills.length > VALIDATION.MAX_SKILLS) {
-      return NextResponse.json(
-        { error: `Number of required skills must be between ${VALIDATION.MIN_SKILLS} and ${VALIDATION.MAX_SKILLS}` },
-        { status: 400 }
-      );
-    }
-
-    if (!VALIDATION.LOCATION_PATTERN.test(body.location)) {
-      return NextResponse.json(
-        { error: 'Location contains invalid characters' },
-        { status: 400 }
-      );
-    }
-
-    if (body.eventDescription.trim().split(/\s+/).length < 5) {
-      return NextResponse.json(
-        { error: 'Event description must contain at least 5 words' },
-        { status: 400 }
-      );
-    }
-
-    const newEvent: Event = {
-      id: Date.now().toString(),
-      ...body
+    // Create event document
+    const eventData: Omit<FirebaseEvent, 'id'> = {
+      eventName: body.eventName,
+      eventDescription: body.eventDescription,
+      location: body.location,
+      requiredSkills: body.requiredSkills,
+      urgency: body.urgency,
+      eventDate: body.eventDate,
+      organizerEmail: email,
+      status: 'Active',
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now()
     };
 
-    events.push(newEvent);
+    const eventsRef = collection(db, 'events');
+    const docRef = await addDoc(eventsRef, eventData);
 
     return NextResponse.json({
       success: true,
-      event: newEvent
+      event: { id: docRef.id, ...eventData }
     });
+
   } catch (error) {
+    console.error('Event creation error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to create event' },
       { status: 500 }
     );
   }
