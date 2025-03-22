@@ -30,8 +30,8 @@ export interface FirebaseEvent {
   eventDate: string;
   organizerEmail: string;
   status: 'Active' | 'Cancelled' | 'Completed';
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: any; // Firebase Timestamp
+  updatedAt: any; // Firebase Timestamp
 }
 
 export interface FirebaseVolunteerHistory {

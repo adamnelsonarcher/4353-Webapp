@@ -13,7 +13,10 @@ interface Event {
   requiredSkills: string[];
   urgency: 'Low' | 'Medium' | 'High';
   eventDate: string;
-  status?: 'Pending' | 'Participated' | 'Canceled' | 'No Show';
+  status?: 'Active' | 'Cancelled' | 'Completed';
+  organizerEmail?: string;
+  createdAt?: any;
+  updatedAt?: any;
 }
 
 interface Volunteer {
@@ -69,6 +72,8 @@ export default function OrganizationDashboard() {
       date: "2024-03-13"
     }
   ]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const TRANSITION_DURATION = 300;
 
@@ -76,80 +81,35 @@ export default function OrganizationDashboard() {
     const fetchEvents = async () => {
       try {
         const email = localStorage.getItem('organizationEmail');
-        const response = await fetch('/api/events', {
+        console.log('Organization Email:', email);
+        const response = await fetch('/api/events?type=organization', {
           headers: {
             'x-user-email': email || ''
           }
         });
         
-        if (response.ok) {
-          const data = await response.json();
-          setEvents(data);
-        }
+        if (!response.ok) throw new Error('Failed to fetch events');
+        
+        const data = await response.json();
+        setEvents(data);
       } catch (error) {
         console.error('Failed to fetch events:', error);
+        setError('Failed to load events');
       }
     };
 
     const isLoggedIn = localStorage.getItem('organizationLoggedIn');
     if (isLoggedIn) {
       fetchEvents();
+    } else {
+      router.push('/organization/login');
     }
-  }, []);
+  }, [router]);
 
-  const handleEventSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!eventFormData.eventName || !eventFormData.eventDescription || 
-        !eventFormData.location || !eventFormData.requiredSkills.length || 
-        !eventFormData.urgency || !eventFormData.eventDate) {
-      alert('Please fill in all required fields');
-      return;
-    }
-
-    // Validate field lengths
-    if (eventFormData.eventName.length > 100) {
-      alert('Event name must be 100 characters or less');
-      return;
-    }
-    if (eventFormData.eventDescription.length > 500) {
-      alert('Event description must be 500 characters or less');
-      return;
-    }
-    if (eventFormData.location.length > 200) {
-      alert('Location must be 200 characters or less');
-      return;
-    }
-
-    const today = new Date().toISOString().split('T')[0];
-    const maxDate = new Date();
-    maxDate.setFullYear(maxDate.getFullYear() + 1);
-    const maxDateStr = maxDate.toISOString().split('T')[0];
-
-    if (eventFormData.eventDate < today) {
-      alert('Event date cannot be in the past');
-      return;
-    }
-
-    if (eventFormData.eventDate > maxDateStr) {
-      alert('Event date cannot be more than 1 year in the future');
-      return;
-    }
-
-    if (eventFormData.requiredSkills.length > 5) {
-      alert('Maximum 5 skills can be selected');
-      return;
-    }
-
-    if (eventFormData.eventDescription.trim().split(/\s+/).length < 5) {
-      alert('Event description must contain at least 5 words');
-      return;
-    }
-
-    if (!/^[A-Za-z0-9\s,.-]+$/.test(eventFormData.location)) {
-      alert('Location contains invalid characters');
-      return;
-    }
+    setLoading(true);
+    setError('');
 
     try {
       const email = localStorage.getItem('organizationEmail');
@@ -162,25 +122,27 @@ export default function OrganizationDashboard() {
         body: JSON.stringify(eventFormData)
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setEvents(prev => [...prev, data.event]);
-        setShowEventForm(false);
-        setEventFormData({
-          eventName: '',
-          eventDescription: '',
-          location: '',
-          requiredSkills: [],
-          urgency: 'Medium',
-          eventDate: ''
-        });
-      } else {
-        alert(data.error || 'Failed to create event');
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to create event');
       }
+
+      const data = await response.json();
+      setEvents(prev => [...prev, data.event]);
+      setEventFormData({
+        eventName: '',
+        eventDescription: '',
+        location: '',
+        requiredSkills: [],
+        urgency: 'Medium',
+        eventDate: '',
+      });
+      setShowEventForm(false);
     } catch (error) {
       console.error('Failed to create event:', error);
-      alert('Failed to create event. Please try again.');
+      setError(error instanceof Error ? error.message : 'Failed to create event');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -285,7 +247,7 @@ export default function OrganizationDashboard() {
               ${showEventForm ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}
             `}>
               <div className="p-4 bg-secondary/10 rounded-lg">
-                <form onSubmit={handleEventSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block font-medium mb-1">
                       Event Name <span className="text-red-500">*</span>
