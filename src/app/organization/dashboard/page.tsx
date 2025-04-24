@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
+import ReportGenerator from '@/components/ReportGenerator';
 
 interface Event {
   id?: string;
@@ -215,7 +216,7 @@ export default function OrganizationDashboard() {
     <div className="container-page">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Welcome, [Organization Name]</h1>
+          <h1 className="text-2xl font-bold">Welcome, Organization</h1>
           <Button 
             variant="secondary"
             onClick={() => {
@@ -477,6 +478,11 @@ export default function OrganizationDashboard() {
               <p className="text-secondary-foreground">Total Volunteers: 0</p>
               <p className="text-secondary-foreground">Pending Applications: 0</p>
             </div>
+          </div>
+
+          {/* Report Generation */}
+          <div className="feature-card">
+            <ReportGenerator />
           </div>
         </div>
       </div>
