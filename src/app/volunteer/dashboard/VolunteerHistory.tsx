@@ -148,9 +148,6 @@ export default function VolunteerHistory() {
                     <StatusBadge status={entry.status} />
                   </div>
                   <div className="mt-4 space-y-2">
-                    <p className="text-sm">
-                      <span className="font-medium">Hours:</span> {entry.hours || 'N/A'}
-                    </p>
                     {entry.feedback && (
                       <p className="text-sm">
                         <span className="font-medium">Feedback:</span>{' '}
