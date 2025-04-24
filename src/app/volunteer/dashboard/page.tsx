@@ -181,6 +181,10 @@ export default function VolunteerDashboard() {
               )}
             </div>
             <MatchedEvents userProfile={volunteerProfile} />
+          </div>
+
+          {/* Right column */}
+          <div className="space-y-8">
             <div className="feature-card">
               <h2 className="text-xl font-semibold mb-6">Notifications</h2>
               <div className="space-y-4">
@@ -198,10 +202,6 @@ export default function VolunteerDashboard() {
                 )}
               </div>
             </div>
-          </div>
-
-          {/* Right column */}
-          <div className="space-y-8">
             <VolunteerHistory />
           </div>
         </div>
