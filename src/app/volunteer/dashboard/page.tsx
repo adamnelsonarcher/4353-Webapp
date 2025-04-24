@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import VolunteerHistory from "./VolunteerHistory";
 import MatchedEvents from "./MatchedEvents";
 import { Button } from "@/components/ui/button";
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 interface Notification {
   id: number;
@@ -23,11 +25,9 @@ export default function VolunteerDashboard() {
   useEffect(() => {
     setMounted(true);
     const email = window.localStorage.getItem('userEmail');
-    const name = window.localStorage.getItem('volunteerName');
     const isLoggedIn = window.localStorage.getItem('volunteerLoggedIn');
     
     setVolunteerEmail(email || '');
-    setVolunteerName(name || '');
     
     if (!isLoggedIn) {
       router.push('/volunteer/login');
@@ -39,8 +39,21 @@ export default function VolunteerDashboard() {
   useEffect(() => {
     if (!mounted || !volunteerEmail) return;
 
-    const fetchNotifications = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch volunteer profile data
+        const q = query(
+          collection(db, 'profiles'),
+          where('email', '==', volunteerEmail)
+        );
+        
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          const profileData = querySnapshot.docs[0].data();
+          setVolunteerName(profileData.fullName || 'Volunteer');
+        }
+
+        // Fetch notifications
         const response = await fetch('/api/notifications', {
           headers: {
             'x-user-email': volunteerEmail
@@ -52,11 +65,11 @@ export default function VolunteerDashboard() {
           setNotifications(data);
         }
       } catch (error) {
-        console.error('Failed to fetch notifications:', error);
+        console.error('Failed to fetch data:', error);
       }
     };
 
-    fetchNotifications();
+    fetchData();
   }, [mounted, volunteerEmail]);
 
   if (!mounted) {
