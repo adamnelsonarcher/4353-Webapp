@@ -97,7 +97,7 @@ export default function OrganizationDashboard() {
     phone: '',
     address: '',
     description: '',
-    createdAt: null
+    createdAt: null as { seconds: number; nanoseconds: number } | null
   });
 
   const TRANSITION_DURATION = 300;
@@ -645,9 +645,7 @@ export default function OrganizationDashboard() {
           </div>
           
           {/* Notifications */}
-          <div className={`feature-card h-[200px] ${
-            firstOpenedForm ? 'order-last' : 'order-none'
-          }`}>
+          <div className="feature-card h-[200px]">
             <h2 className="text-xl font-semibold mb-4">Notifications</h2>
             <div className="space-y-2 overflow-y-auto max-h-[120px]">
               {notifications.map((notification) => (
@@ -662,10 +660,68 @@ export default function OrganizationDashboard() {
             </div>
           </div>
 
-          {/* Volunteer History */}
-          <div className={`feature-card col-span-2 ${
-            firstOpenedForm ? 'order-last' : 'order-none'
-          }`}>
+          {/* Quick Stats */}
+          <div className="feature-card">
+            <h2 className="text-xl font-semibold mb-4">Quick Stats</h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-secondary/5 rounded-lg hover:bg-secondary/10 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-full">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-primary"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium">Total Volunteers</span>
+                </div>
+                <span className="text-2xl font-semibold">{stats.totalVolunteers}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-secondary/5 rounded-lg hover:bg-secondary/10 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 rounded-full">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-green-600"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium">Active Events</span>
+                </div>
+                <span className="text-2xl font-semibold">{stats.activeEvents}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-secondary/5 rounded-lg hover:bg-secondary/10 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-yellow-100 rounded-full">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-yellow-600"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium">Pending Applications</span>
+                </div>
+                <span className="text-2xl font-semibold">{stats.pendingApplications}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Report Generation */}
+          <div className="feature-card">
+            <ReportGenerator />
+          </div>
+
+          {/* Volunteer History - Now full width at the bottom */}
+          <div className="feature-card col-span-full">
             <h2 className="text-xl font-semibold mb-4">Volunteer History</h2>
             {historyLoading ? (
               <div className="text-center py-8">
@@ -688,7 +744,7 @@ export default function OrganizationDashboard() {
                 <p className="text-secondary-foreground">No volunteer history available</p>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="grid gap-6 md:grid-cols-2">
                 {volunteerHistory.map((volunteer: any) => (
                   <div 
                     key={volunteer.id}
@@ -760,68 +816,6 @@ export default function OrganizationDashboard() {
                 ))}
               </div>
             )}
-          </div>
-          
-          {/* Quick Stats */}
-          <div className={`feature-card ${
-            firstOpenedForm ? 'order-last' : 'order-none'
-          }`}>
-            <h2 className="text-xl font-semibold mb-4">Quick Stats</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-secondary/5 rounded-lg hover:bg-secondary/10 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-full">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-primary"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                    </svg>
-                  </div>
-                  <span className="text-sm font-medium">Total Volunteers</span>
-                </div>
-                <span className="text-2xl font-semibold">{stats.totalVolunteers}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-secondary/5 rounded-lg hover:bg-secondary/10 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 rounded-full">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-green-600"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <span className="text-sm font-medium">Active Events</span>
-                </div>
-                <span className="text-2xl font-semibold">{stats.activeEvents}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-secondary/5 rounded-lg hover:bg-secondary/10 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-yellow-100 rounded-full">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-yellow-600"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-                    </svg>
-                  </div>
-                  <span className="text-sm font-medium">Pending Applications</span>
-                </div>
-                <span className="text-2xl font-semibold">{stats.pendingApplications}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Report Generation */}
-          <div className="feature-card">
-            <ReportGenerator />
           </div>
         </div>
       </div>
