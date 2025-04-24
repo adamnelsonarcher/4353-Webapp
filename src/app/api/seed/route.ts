@@ -1,21 +1,30 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 
 export async function POST() {
   try {
-    // Add organization user
+    const auth = getAuth();
+    
+    // Create organization user in Auth
+    await createUserWithEmailAndPassword(auth, "seedorg123@test.com", "Test123!");
+
+    // Add organization user to Firestore
     await addDoc(collection(db, 'users'), {
       address: "123 Address Ln",
       createdAt: Timestamp.fromDate(new Date("2025-03-21T23:30:09")),
       description: "Testing Org",
-      email: "testorg@email.com",
+      email: "seedorg123@test.com",
       orgName: "TestOrg",
       phone: "8321234444",
       userType: "organization"
     });
 
-    // Add volunteer user
+    // Create volunteer user in Auth
+    await createUserWithEmailAndPassword(auth, "seedvol123@test.com", "Test123!");
+
+    // Add volunteer user to Firestore
     await addDoc(collection(db, 'profiles'), {
       address1: "1232 Address St.",
       address2: "",
@@ -25,7 +34,7 @@ export async function POST() {
       }],
       city: "Houston",
       createdAt: Timestamp.fromDate(new Date("2025-03-20T19:37:33")),
-      email: "test12@test.com",
+      email: "seedvol123@test.com",
       fullName: "Tester Name",
       preferences: "",
       skills: ["Leadership", "Communication"]
@@ -38,7 +47,7 @@ export async function POST() {
       eventDescription: "event Test 1",
       eventName: "Test Event",
       location: "Location 1",
-      organizerEmail: "testorg@email.com",
+      organizerEmail: "seedorg123@test.com",
       requiredSkills: ["Leadership", "Communication"],
       status: "Active",
       updatedAt: Timestamp.fromDate(new Date("2025-03-21T23:31:22")),
@@ -53,10 +62,10 @@ export async function POST() {
       participationDate: Timestamp.fromDate(new Date("2025-03-21T23:18:18")),
       status: "Pending",
       updatedAt: Timestamp.fromDate(new Date("2025-03-21T23:18:18")),
-      volunteerId: "test12@test.com",
+      volunteerId: "seedvol123@test.com",
       volunteerName: "Tester Name",
-      volunteerEmail: "test12@test.com",
-      organizerEmail: "testorg@email.com"
+      volunteerEmail: "seedvol123@test.com",
+      organizerEmail: "seedorg123@test.com"
     });
 
     return NextResponse.json({ message: 'Sample data created successfully' });

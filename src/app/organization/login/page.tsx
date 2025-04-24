@@ -64,7 +64,7 @@ export default function OrganizationLogin() {
         <div className="form-container">
           {/* Test Notice */}
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
-            For assignment 4, we now can create accounts and login. You can create your own account, or use this one []
+            You can create your own account, or use this one [seedorg123@test.com, Test123!]
           </div>
 
           {/* Back Button */}
