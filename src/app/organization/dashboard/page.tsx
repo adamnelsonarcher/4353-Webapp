@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import ReportGenerator from '@/components/ReportGenerator';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
+import { Badge } from "@/components/ui/badge";
 
 interface Event {
   id?: string;
@@ -81,6 +82,14 @@ export default function OrganizationDashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const [stats, setStats] = useState({
+    activeEvents: 0,
+    totalVolunteers: 0,
+    pendingApplications: 0
+  });
+  const [volunteerHistory, setVolunteerHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+
   const TRANSITION_DURATION = 300;
 
   useEffect(() => {
@@ -131,6 +140,50 @@ export default function OrganizationDashboard() {
     if (orgEmail) {
       fetchData();
     }
+  }, [mounted, orgEmail]);
+
+  useEffect(() => {
+    if (!mounted || !orgEmail) return;
+
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('/api/organization/stats', {
+          headers: {
+            'x-user-email': orgEmail
+          }
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch stats');
+        
+        const data = await response.json();
+        setStats(data);
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+      }
+    };
+
+    const fetchHistory = async () => {
+      try {
+        setHistoryLoading(true);
+        const response = await fetch('/api/organization/volunteer-history', {
+          headers: {
+            'x-user-email': orgEmail
+          }
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch history');
+        
+        const data = await response.json();
+        setVolunteerHistory(data);
+      } catch (error) {
+        console.error('Failed to fetch history:', error);
+      } finally {
+        setHistoryLoading(false);
+      }
+    };
+
+    fetchStats();
+    fetchHistory();
   }, [mounted, orgEmail]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -494,11 +547,51 @@ export default function OrganizationDashboard() {
           </div>
 
           {/* Volunteer History */}
-          <div className={`feature-card h-[200px] ${
+          <div className={`feature-card ${
             firstOpenedForm ? 'order-last' : 'order-none'
           }`}>
             <h2 className="text-xl font-semibold mb-4">Volunteer History</h2>
-            <p className="text-secondary-foreground">No volunteer history available</p>
+            {historyLoading ? (
+              <p className="text-secondary-foreground">Loading history...</p>
+            ) : volunteerHistory.length === 0 ? (
+              <p className="text-secondary-foreground">No volunteer history available</p>
+            ) : (
+              <div className="space-y-4 max-h-[300px] overflow-y-auto">
+                {volunteerHistory.map((entry: any) => (
+                  <div 
+                    key={entry.id}
+                    className="p-4 bg-secondary/5 rounded-lg hover:bg-secondary/10 transition-colors"
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="font-medium">{entry.eventName}</h3>
+                        <p className="text-sm text-secondary-foreground">
+                          {entry.volunteerName} ({entry.volunteerEmail})
+                        </p>
+                      </div>
+                      <Badge
+                        variant={
+                          entry.status === 'Completed' ? 'default' :
+                          entry.status === 'Pending' ? 'secondary' :
+                          entry.status === 'Canceled' ? 'destructive' :
+                          'outline'
+                        }
+                        className="ml-2"
+                      >
+                        {entry.status}
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-secondary-foreground">
+                      <p>Date: {new Date(entry.participationDate.seconds * 1000).toLocaleDateString()}</p>
+                      <p>Hours: {entry.hours}</p>
+                      {entry.feedback && (
+                        <p className="mt-2">Feedback: {entry.feedback}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           
           {/* Quick Stats */}
@@ -506,10 +599,19 @@ export default function OrganizationDashboard() {
             firstOpenedForm ? 'order-last' : 'order-none'
           }`}>
             <h2 className="text-xl font-semibold mb-4">Quick Stats</h2>
-            <div className="space-y-2">
-              <p className="text-secondary-foreground">Active Events: {events.length}</p>
-              <p className="text-secondary-foreground">Total Volunteers: 0</p>
-              <p className="text-secondary-foreground">Pending Applications: 0</p>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-2 bg-secondary/5 rounded-lg">
+                <span className="text-secondary-foreground">Active Events</span>
+                <span className="font-medium">{stats.activeEvents}</span>
+              </div>
+              <div className="flex items-center justify-between p-2 bg-secondary/5 rounded-lg">
+                <span className="text-secondary-foreground">Total Volunteers</span>
+                <span className="font-medium">{stats.totalVolunteers}</span>
+              </div>
+              <div className="flex items-center justify-between p-2 bg-secondary/5 rounded-lg">
+                <span className="text-secondary-foreground">Pending Applications</span>
+                <span className="font-medium">{stats.pendingApplications}</span>
+              </div>
             </div>
           </div>
 
