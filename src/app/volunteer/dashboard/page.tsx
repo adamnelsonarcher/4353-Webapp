@@ -16,49 +16,67 @@ export default function VolunteerDashboard() {
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [volunteerName, setVolunteerName] = useState<string>('');
+  const [volunteerEmail, setVolunteerEmail] = useState('');
+  const [mounted, setMounted] = useState(false);
 
+  // Handle initial mount
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('volunteerLoggedIn');
+    setMounted(true);
+    const email = window.localStorage.getItem('userEmail');
+    const name = window.localStorage.getItem('volunteerName');
+    const isLoggedIn = window.localStorage.getItem('volunteerLoggedIn');
+    
+    setVolunteerEmail(email || '');
+    setVolunteerName(name || '');
+    
     if (!isLoggedIn) {
       router.push('/volunteer/login');
-    } else {
-      // Get volunteer name from localStorage
-      const name = localStorage.getItem('volunteerName');
-      if (name) {
-        setVolunteerName(name);
-      }
-      
-      const fetchNotifications = async () => {
-        try {
-          const email = localStorage.getItem('userEmail');
-          const response = await fetch('/api/notifications', {
-            headers: {
-              'x-user-email': email || ''
-            }
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            setNotifications(data);
-          }
-        } catch (error) {
-          console.error('Failed to fetch notifications:', error);
-        }
-      };
-
-      fetchNotifications();
+      return;
     }
   }, [router]);
+
+  // Handle data fetching after mount
+  useEffect(() => {
+    if (!mounted || !volunteerEmail) return;
+
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch('/api/notifications', {
+          headers: {
+            'x-user-email': volunteerEmail
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setNotifications(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+      }
+    };
+
+    fetchNotifications();
+  }, [mounted, volunteerEmail]);
+
+  if (!mounted) {
+    return null; // or a loading spinner
+  }
 
   return (
     <div className="container-page">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Welcome, {volunteerName || 'Volunteer'}</h1>
+          <div>
+            <h1 className="text-2xl font-bold">Welcome, {volunteerName || 'Volunteer'}</h1>
+            <p className="text-secondary-foreground mt-1">{volunteerEmail}</p>
+          </div>
           <Button 
             variant="secondary"
             onClick={() => {
-              localStorage.removeItem('volunteerLoggedIn');
+              window.localStorage.removeItem('volunteerLoggedIn');
+              window.localStorage.removeItem('userEmail');
+              window.localStorage.removeItem('volunteerName');
               router.push('/');
             }}
             className="hover:opacity-90 transition-opacity"
