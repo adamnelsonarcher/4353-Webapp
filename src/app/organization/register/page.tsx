@@ -195,7 +195,7 @@ export default function OrganizationRegistration() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-secondary-foreground">
               Already have an account?{" "}
               <Button 
@@ -205,6 +205,17 @@ export default function OrganizationRegistration() {
                 className="hover:opacity-90 transition-opacity"
               >
                 <Link href="/organization/login">Login</Link>
+              </Button>
+            </p>
+            <p className="text-sm text-secondary-foreground">
+              Want to register as a volunteer instead?{" "}
+              <Button 
+                asChild
+                variant="secondary" 
+                size="sm" 
+                className="hover:opacity-90 transition-opacity"
+              >
+                <Link href="/volunteer/register">Register as Volunteer</Link>
               </Button>
             </p>
           </div>

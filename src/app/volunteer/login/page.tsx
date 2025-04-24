@@ -115,12 +115,12 @@ export default function VolunteerLogin() {
               Don't have an account?
             </p>
             <Button 
-              href="/volunteer/register" 
+              asChild
               variant="accent" 
               size="sm"
               className="hover:opacity-90 transition-opacity"
             >
-              Register as Volunteer
+              <Link href="/volunteer/register">Register as Volunteer</Link>
             </Button>
           </div>
         </div>
