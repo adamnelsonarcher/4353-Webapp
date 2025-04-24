@@ -216,7 +216,10 @@ export default function OrganizationDashboard() {
     <div className="container-page">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Welcome, Organization</h1>
+          <div>
+            <h1 className="text-2xl font-bold">Welcome, Organization</h1>
+            <p className="text-secondary-foreground mt-1">{localStorage.getItem('organizationEmail')}</p>
+          </div>
           <Button 
             variant="secondary"
             onClick={() => {
