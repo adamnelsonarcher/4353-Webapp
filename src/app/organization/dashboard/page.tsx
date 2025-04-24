@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import ReportGenerator from '@/components/ReportGenerator';
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 interface Event {
   id?: string;
@@ -40,6 +42,9 @@ interface Notification {
 
 export default function OrganizationDashboard() {
   const router = useRouter();
+  const [orgName, setOrgName] = useState('Organization');
+  const [orgEmail, setOrgEmail] = useState('');
+  const [mounted, setMounted] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
   const [showMatchingForm, setShowMatchingForm] = useState(false);
   const [firstOpenedForm, setFirstOpenedForm] = useState<'event' | 'matching' | null>(null);
@@ -79,13 +84,37 @@ export default function OrganizationDashboard() {
   const TRANSITION_DURATION = 300;
 
   useEffect(() => {
-    const fetchEvents = async () => {
+    setMounted(true);
+    const email = window.localStorage.getItem('organizationEmail');
+    const isLoggedIn = window.localStorage.getItem('organizationLoggedIn');
+    
+    setOrgEmail(email || '');
+    
+    if (!isLoggedIn) {
+      router.push('/organization/login');
+      return;
+    }
+  }, [router]);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    const fetchData = async () => {
       try {
-        const email = localStorage.getItem('organizationEmail');
-        console.log('Organization Email:', email);
+        const q = query(
+          collection(db, 'users'),
+          where('email', '==', orgEmail)
+        );
+        
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          const orgData = querySnapshot.docs[0].data();
+          setOrgName(orgData.orgName || 'Organization');
+        }
+
         const response = await fetch('/api/events?type=organization', {
           headers: {
-            'x-user-email': email || ''
+            'x-user-email': orgEmail
           }
         });
         
@@ -94,18 +123,15 @@ export default function OrganizationDashboard() {
         const data = await response.json();
         setEvents(data);
       } catch (error) {
-        console.error('Failed to fetch events:', error);
-        setError('Failed to load events');
+        console.error('Failed to fetch data:', error);
+        setError('Failed to load data');
       }
     };
 
-    const isLoggedIn = localStorage.getItem('organizationLoggedIn');
-    if (isLoggedIn) {
-      fetchEvents();
-    } else {
-      router.push('/organization/login');
+    if (orgEmail) {
+      fetchData();
     }
-  }, [router]);
+  }, [mounted, orgEmail]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,12 +139,11 @@ export default function OrganizationDashboard() {
     setError('');
 
     try {
-      const email = localStorage.getItem('organizationEmail');
       const response = await fetch('/api/events', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': email || ''
+          'x-user-email': orgEmail
         },
         body: JSON.stringify(eventFormData)
       });
@@ -212,18 +237,23 @@ export default function OrganizationDashboard() {
     setMatchedEvents(mockMatchedEvents[volunteerId] || []);
   };
 
+  if (!mounted) {
+    return null; // or a loading spinner
+  }
+
   return (
     <div className="container-page">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold">Welcome, Organization</h1>
-            <p className="text-secondary-foreground mt-1">{localStorage.getItem('organizationEmail')}</p>
+            <h1 className="text-2xl font-bold">Welcome, {orgName}</h1>
+            <p className="text-secondary-foreground mt-1">{orgEmail}</p>
           </div>
           <Button 
             variant="secondary"
             onClick={() => {
-              localStorage.removeItem('organizationLoggedIn');
+              window.localStorage.removeItem('organizationLoggedIn');
+              window.localStorage.removeItem('organizationEmail');
               router.push('/');
             }}
             className="hover:opacity-90 transition-opacity"
