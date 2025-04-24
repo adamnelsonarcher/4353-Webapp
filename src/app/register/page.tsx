@@ -1,4 +1,7 @@
+'use client';
+
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function RegisterSelection() {
   return (
@@ -8,13 +11,15 @@ export default function RegisterSelection() {
           {/* Back Button */}
           <div className="mb-8">
             <Button 
-              href="/"
+              asChild
               variant="secondary"
               size="sm"
               className="hover:opacity-90 transition-opacity inline-flex items-center gap-2"
             >
-              <span>←</span>
-              <span>Back to Home</span>
+              <Link href="/">
+                <span>←</span>
+                <span>Back to Home</span>
+              </Link>
             </Button>
           </div>
 
@@ -27,8 +32,12 @@ export default function RegisterSelection() {
               <p className="text-secondary-foreground mb-6">
                 Find meaningful opportunities to contribute your skills and time to causes you care about.
               </p>
-              <Button href="/volunteer/register" variant="primary" className="w-full hover:opacity-90 transition-opacity">
-                Register as Volunteer
+              <Button 
+                asChild
+                variant="primary" 
+                className="w-full hover:opacity-90 transition-opacity"
+              >
+                <Link href="/volunteer/register">Register as Volunteer</Link>
               </Button>
             </div>
 
@@ -38,8 +47,12 @@ export default function RegisterSelection() {
               <p className="text-secondary-foreground mb-6">
                 Connect with passionate volunteers and manage your volunteer programs effectively.
               </p>
-              <Button href="/organization/register" variant="primary" className="w-full hover:opacity-90 transition-opacity">
-                Register Organization
+              <Button 
+                asChild
+                variant="primary" 
+                className="w-full hover:opacity-90 transition-opacity"
+              >
+                <Link href="/organization/register">Register Organization</Link>
               </Button>
             </div>
           </div>
@@ -47,8 +60,13 @@ export default function RegisterSelection() {
           <div className="mt-8 text-center">
             <p className="text-sm text-secondary-foreground">
               Already have an account?{" "}
-              <Button href="/volunteer/login" variant="secondary" size="sm" className="hover:opacity-90 transition-opacity">
-                Login
+              <Button 
+                asChild
+                variant="secondary" 
+                size="sm" 
+                className="hover:opacity-90 transition-opacity"
+              >
+                <Link href="/volunteer/login">Login</Link>
               </Button>
             </p>
           </div>

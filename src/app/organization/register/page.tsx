@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Link } from 'next/navigation';
 
 export default function OrganizationRegistration() {
   const router = useRouter();
@@ -196,8 +197,13 @@ export default function OrganizationRegistration() {
           <div className="mt-6 text-center">
             <p className="text-sm text-secondary-foreground">
               Already have an account?{" "}
-              <Button href="/organization/login" variant="secondary" size="sm" className="hover:opacity-90 transition-opacity">
-                Login
+              <Button 
+                asChild
+                variant="secondary" 
+                size="sm" 
+                className="hover:opacity-90 transition-opacity"
+              >
+                <Link href="/organization/login">Login</Link>
               </Button>
             </p>
           </div>

@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Link from "next/link";
 
 export default function OrganizationLogin() {
   const router = useRouter();
@@ -70,13 +71,15 @@ export default function OrganizationLogin() {
           {/* Back Button */}
           <div className="mb-8">
             <Button 
-              href="/"
+              asChild
               variant="secondary"
               size="sm"
               className="hover:opacity-90 transition-opacity inline-flex items-center gap-2"
             >
-              <span>←</span>
-              <span>Back to Home</span>
+              <Link href="/">
+                <span>←</span>
+                <span>Back to Home</span>
+              </Link>
             </Button>
           </div>
 
@@ -131,12 +134,14 @@ export default function OrganizationLogin() {
               Don't have an account?
             </p>
             <Button 
-              href="/organization/register" 
+              asChild
               variant="accent" 
               size="sm"
               className="hover:opacity-90 transition-opacity"
             >
-              Register Organization
+              <Link href="/organization/register">
+                Register Organization
+              </Link>
             </Button>
           </div>
         </div>

@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function VolunteerRegistration() {
   const router = useRouter();
@@ -103,13 +104,15 @@ export default function VolunteerRegistration() {
           {/* Back Button */}
           <div className="mb-8">
             <Button 
-              href="/"
+              asChild
               variant="secondary"
               size="sm"
               className="hover:opacity-90 transition-opacity inline-flex items-center gap-2"
             >
-              <span>←</span>
-              <span>Back to Home</span>
+              <Link href="/">
+                <span>←</span>
+                <span>Back to Home</span>
+              </Link>
             </Button>
           </div>
 
@@ -180,8 +183,13 @@ export default function VolunteerRegistration() {
           <div className="mt-6 text-center">
             <p className="text-sm text-secondary-foreground">
               Already have an account?{" "}
-              <Button href="/volunteer/login" variant="secondary" size="sm" className="hover:opacity-90 transition-opacity">
-                Login
+              <Button 
+                asChild
+                variant="secondary" 
+                size="sm" 
+                className="hover:opacity-90 transition-opacity"
+              >
+                <Link href="/volunteer/login">Login</Link>
               </Button>
             </p>
           </div>
