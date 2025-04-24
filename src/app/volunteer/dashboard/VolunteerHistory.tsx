@@ -78,7 +78,15 @@ export default function VolunteerHistory() {
                 eventId: '1', // Using the test event ID from your events array
                 eventName: 'Houston Food Bank',
                 status: 'Pending',
-                participationDate: new Date()
+                participationDate: new Date().toLocaleString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  timeZoneName: 'short'
+                })
               })
             });
 
@@ -102,7 +110,7 @@ export default function VolunteerHistory() {
                 <div>
                   <h3 className="font-medium">{entry.eventName}</h3>
                   <p className="text-sm text-gray-500">
-                    {new Date(entry.participationDate).toLocaleDateString()}
+                    {entry.participationDate || 'Date not available'}
                   </p>
                   {entry.hours && (
                     <p className="text-sm text-gray-600">

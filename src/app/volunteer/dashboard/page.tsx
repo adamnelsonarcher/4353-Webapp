@@ -15,12 +15,19 @@ interface Notification {
 export default function VolunteerDashboard() {
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [volunteerName, setVolunteerName] = useState<string>('');
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('volunteerLoggedIn');
     if (!isLoggedIn) {
       router.push('/volunteer/login');
     } else {
+      // Get volunteer name from localStorage
+      const name = localStorage.getItem('volunteerName');
+      if (name) {
+        setVolunteerName(name);
+      }
+      
       const fetchNotifications = async () => {
         try {
           const email = localStorage.getItem('userEmail');
@@ -47,7 +54,7 @@ export default function VolunteerDashboard() {
     <div className="container-page">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Welcome, [Volunteer Name]</h1>
+          <h1 className="text-2xl font-bold">Welcome, {volunteerName || 'Volunteer'}</h1>
           <Button 
             variant="secondary"
             onClick={() => {
