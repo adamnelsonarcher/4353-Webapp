@@ -49,6 +49,9 @@ export default function OrganizationDashboard() {
   const [showEventForm, setShowEventForm] = useState(false);
   const [showMatchingForm, setShowMatchingForm] = useState(false);
   const [firstOpenedForm, setFirstOpenedForm] = useState<'event' | 'matching' | null>(null);
+  const [historyError, setHistoryError] = useState('');
+  const [volunteerHistory, setVolunteerHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
 
   const [eventFormData, setEventFormData] = useState<Event>({
     eventName: '',
@@ -87,10 +90,49 @@ export default function OrganizationDashboard() {
     totalVolunteers: 0,
     pendingApplications: 0
   });
-  const [volunteerHistory, setVolunteerHistory] = useState([]);
-  const [historyLoading, setHistoryLoading] = useState(true);
+
+  const [orgProfile, setOrgProfile] = useState({
+    orgName: '',
+    email: '',
+    phone: '',
+    address: '',
+    description: '',
+    createdAt: null
+  });
 
   const TRANSITION_DURATION = 300;
+
+  const fetchHistory = async () => {
+    if (!mounted || !orgEmail) return;
+    
+    try {
+      setHistoryLoading(true);
+      setHistoryError('');
+      const response = await fetch('/api/organization/volunteer-history', {
+        headers: {
+          'x-user-email': orgEmail
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch history');
+      }
+      
+      const data = await response.json();
+      setVolunteerHistory(data);
+    } catch (error) {
+      console.error('Failed to fetch history:', error);
+      setHistoryError('Failed to load volunteer history. Please try again later.');
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!mounted || !orgEmail) return;
+    fetchHistory();
+  }, [mounted, orgEmail]);
 
   useEffect(() => {
     setMounted(true);
@@ -162,28 +204,31 @@ export default function OrganizationDashboard() {
       }
     };
 
-    const fetchHistory = async () => {
+    fetchStats();
+  }, [mounted, orgEmail]);
+
+  useEffect(() => {
+    if (!mounted || !orgEmail) return;
+
+    const fetchOrgProfile = async () => {
       try {
-        setHistoryLoading(true);
-        const response = await fetch('/api/organization/volunteer-history', {
+        const response = await fetch('/api/organization/profile', {
           headers: {
             'x-user-email': orgEmail
           }
         });
         
-        if (!response.ok) throw new Error('Failed to fetch history');
+        if (!response.ok) throw new Error('Failed to fetch profile');
         
         const data = await response.json();
-        setVolunteerHistory(data);
+        setOrgProfile(data);
+        setOrgName(data.orgName);
       } catch (error) {
-        console.error('Failed to fetch history:', error);
-      } finally {
-        setHistoryLoading(false);
+        console.error('Failed to fetch profile:', error);
       }
     };
 
-    fetchStats();
-    fetchHistory();
+    fetchOrgProfile();
   }, [mounted, orgEmail]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -316,6 +361,39 @@ export default function OrganizationDashboard() {
         </div>
         
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* Organization Profile */}
+          <div className="feature-card">
+            <h2 className="text-xl font-semibold mb-4">Organization Profile</h2>
+            <div className="space-y-4">
+              <div className="p-4 bg-secondary/5 rounded-lg">
+                <div className="space-y-2">
+                  <p className="text-sm">
+                    <span className="font-medium">Phone:</span>{' '}
+                    {orgProfile.phone || 'Not provided'}
+                  </p>
+                  <p className="text-sm">
+                    <span className="font-medium">Address:</span>{' '}
+                    {orgProfile.address || 'Not provided'}
+                  </p>
+                  {orgProfile.description && (
+                    <p className="text-sm mt-4">
+                      <span className="font-medium">About:</span><br />
+                      {orgProfile.description}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => {/* TODO: Add edit profile functionality */}}
+              >
+                Edit Profile
+              </Button>
+            </div>
+          </div>
+          
           {/* Event Management */}
           <div className={`feature-card transition-all duration-300 ease-in-out ${
             showEventForm ? 'col-span-full row-span-2 h-auto' : 'h-[200px]'
@@ -547,46 +625,105 @@ export default function OrganizationDashboard() {
           </div>
 
           {/* Volunteer History */}
-          <div className={`feature-card ${
+          <div className={`feature-card col-span-2 ${
             firstOpenedForm ? 'order-last' : 'order-none'
           }`}>
             <h2 className="text-xl font-semibold mb-4">Volunteer History</h2>
             {historyLoading ? (
-              <p className="text-secondary-foreground">Loading history...</p>
+              <div className="text-center py-8">
+                <p className="text-secondary-foreground">Loading volunteer history...</p>
+              </div>
+            ) : historyError ? (
+              <div className="text-center py-8">
+                <p className="text-red-500">{historyError}</p>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={fetchHistory}
+                  className="mt-4"
+                >
+                  Try Again
+                </Button>
+              </div>
             ) : volunteerHistory.length === 0 ? (
-              <p className="text-secondary-foreground">No volunteer history available</p>
+              <div className="text-center py-8">
+                <p className="text-secondary-foreground">No volunteer history available</p>
+              </div>
             ) : (
-              <div className="space-y-4 max-h-[300px] overflow-y-auto">
-                {volunteerHistory.map((entry: any) => (
+              <div className="space-y-6">
+                {volunteerHistory.map((volunteer: any) => (
                   <div 
-                    key={entry.id}
-                    className="p-4 bg-secondary/5 rounded-lg hover:bg-secondary/10 transition-colors"
+                    key={volunteer.id}
+                    className="p-4 bg-secondary/5 rounded-lg"
                   >
-                    <div className="flex justify-between items-start mb-2">
+                    <div className="flex justify-between items-start mb-4">
                       <div>
-                        <h3 className="font-medium">{entry.eventName}</h3>
-                        <p className="text-sm text-secondary-foreground">
-                          {entry.volunteerName} ({entry.volunteerEmail})
+                        <h3 className="text-lg font-medium">{volunteer.name}</h3>
+                        <p className="text-sm text-secondary-foreground">{volunteer.email}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">Total Hours: {volunteer.totalHours}</p>
+                        <p className="text-xs text-secondary-foreground">
+                          {volunteer.completedEvents} completed / {volunteer.eventsParticipated} total events
                         </p>
                       </div>
-                      <Badge
-                        variant={
-                          entry.status === 'Completed' ? 'default' :
-                          entry.status === 'Pending' ? 'secondary' :
-                          entry.status === 'Canceled' ? 'destructive' :
-                          'outline'
-                        }
-                        className="ml-2"
-                      >
-                        {entry.status}
-                      </Badge>
                     </div>
-                    <div className="text-sm text-secondary-foreground">
-                      <p>Date: {new Date(entry.participationDate.seconds * 1000).toLocaleDateString()}</p>
-                      <p>Hours: {entry.hours}</p>
-                      {entry.feedback && (
-                        <p className="mt-2">Feedback: {entry.feedback}</p>
-                      )}
+
+                    {volunteer.skills.length > 0 && (
+                      <div className="mb-4">
+                        <p className="text-sm font-medium mb-2">Skills:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {volunteer.skills.map((skill: string, index: number) => (
+                            <span
+                              key={index}
+                              className="px-2 py-1 text-xs bg-secondary/10 rounded-full"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Recent Activity:</p>
+                      <div className="space-y-2">
+                        {volunteer.history.slice(0, 3).map((entry: any) => (
+                          <div
+                            key={entry.id}
+                            className="flex justify-between items-center p-2 bg-background rounded"
+                          >
+                            <div>
+                              <p className="text-sm font-medium">{entry.eventName}</p>
+                              <p className="text-xs text-secondary-foreground">
+                                {entry.participationDate 
+                                  ? new Date(entry.participationDate.seconds * 1000).toLocaleDateString('en-US', {
+                                      year: 'numeric',
+                                      month: 'long',
+                                      day: 'numeric'
+                                    })
+                                  : 'Date not set'
+                                }
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant={
+                                entry.status === 'Completed' ? 'default' :
+                                entry.status === 'Pending' ? 'secondary' :
+                                entry.status === 'Canceled' ? 'destructive' :
+                                'outline'
+                              }>
+                                {entry.status}
+                              </Badge>
+                              {entry.hours > 0 && (
+                                <span className="text-xs text-secondary-foreground">
+                                  {entry.hours}h
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 ))}
