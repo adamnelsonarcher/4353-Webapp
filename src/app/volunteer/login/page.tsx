@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Link from "next/link";
 
 export default function VolunteerLogin() {
   const router = useRouter();
@@ -58,13 +59,15 @@ export default function VolunteerLogin() {
 
           <div className="mb-8">
             <Button 
-              href="/"
+              asChild
               variant="secondary"
               size="sm"
               className="hover:opacity-90 transition-opacity inline-flex items-center gap-2"
             >
-              <span>←</span>
-              <span>Back to Home</span>
+              <Link href="/">
+                <span>←</span>
+                <span>Back to Home</span>
+              </Link>
             </Button>
           </div>
 
@@ -112,12 +115,12 @@ export default function VolunteerLogin() {
               Don't have an account?
             </p>
             <Button 
-              href="/volunteer/register" 
+              asChild
               variant="accent" 
               size="sm"
               className="hover:opacity-90 transition-opacity"
             >
-              Register as Volunteer
+              <Link href="/volunteer/register">Register as Volunteer</Link>
             </Button>
           </div>
         </div>

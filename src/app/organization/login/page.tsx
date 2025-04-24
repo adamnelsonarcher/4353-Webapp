@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Link from "next/link";
 
 export default function OrganizationLogin() {
   const router = useRouter();
@@ -64,19 +65,21 @@ export default function OrganizationLogin() {
         <div className="form-container">
           {/* Test Notice */}
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
-            For assignment 4, we now can create accounts and login. You can create your own account, or use this one []
+            You can create your own account, or use this one [seedorg123@test.com, Test123!]
           </div>
 
           {/* Back Button */}
           <div className="mb-8">
             <Button 
-              href="/"
+              asChild
               variant="secondary"
               size="sm"
               className="hover:opacity-90 transition-opacity inline-flex items-center gap-2"
             >
-              <span>←</span>
-              <span>Back to Home</span>
+              <Link href="/">
+                <span>←</span>
+                <span>Back to Home</span>
+              </Link>
             </Button>
           </div>
 
@@ -131,12 +134,14 @@ export default function OrganizationLogin() {
               Don't have an account?
             </p>
             <Button 
-              href="/organization/register" 
+              asChild
               variant="accent" 
               size="sm"
               className="hover:opacity-90 transition-opacity"
             >
-              Register Organization
+              <Link href="/organization/register">
+                Register Organization
+              </Link>
             </Button>
           </div>
         </div>

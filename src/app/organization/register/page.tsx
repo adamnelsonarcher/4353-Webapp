@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function OrganizationRegistration() {
   const router = useRouter();
@@ -77,15 +78,16 @@ export default function OrganizationRegistration() {
         <div className="form-container">
           {/* Back Button */}
           <div className="mb-8">
-            <Button 
-              href="/organization/login"
-              variant="secondary"
-              size="sm"
-              className="hover:opacity-90 transition-opacity inline-flex items-center gap-2"
-            >
-              <span>←</span>
-              <span>Back to Login</span>
-            </Button>
+            <Link href="/organization/login">
+              <Button 
+                variant="secondary"
+                size="sm"
+                className="hover:opacity-90 transition-opacity inline-flex items-center gap-2"
+              >
+                <span>←</span>
+                <span>Back to Login</span>
+              </Button>
+            </Link>
           </div>
 
           <h1 className="heading-primary">Organization Registration</h1>
@@ -193,11 +195,27 @@ export default function OrganizationRegistration() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-secondary-foreground">
               Already have an account?{" "}
-              <Button href="/organization/login" variant="secondary" size="sm" className="hover:opacity-90 transition-opacity">
-                Login
+              <Button 
+                asChild
+                variant="secondary" 
+                size="sm" 
+                className="hover:opacity-90 transition-opacity"
+              >
+                <Link href="/organization/login">Login</Link>
+              </Button>
+            </p>
+            <p className="text-sm text-secondary-foreground">
+              Want to register as a volunteer instead?{" "}
+              <Button 
+                asChild
+                variant="secondary" 
+                size="sm" 
+                className="hover:opacity-90 transition-opacity"
+              >
+                <Link href="/volunteer/register">Register as Volunteer</Link>
               </Button>
             </p>
           </div>

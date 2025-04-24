@@ -2,6 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface HistoryEntry {
   id: string;
@@ -14,6 +27,53 @@ interface HistoryEntry {
   feedback?: string;
   hours?: number;
 }
+
+const StatusBadge = ({ status }: { status: string }) => {
+  const getStatusStyles = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'participated':
+        return 'bg-green-100 text-green-800 border-green-300';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'canceled':
+        return 'bg-red-100 text-red-800 border-red-300';
+      case 'no show':
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+  };
+
+  const getStatusDescription = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'participated':
+        return 'You successfully participated in this event';
+      case 'pending':
+        return 'Your participation is awaiting confirmation';
+      case 'canceled':
+        return 'You or the organization canceled this participation';
+      case 'no show':
+        return 'You were marked as not showing up for this event';
+      default:
+        return 'Status unknown';
+    }
+  };
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger>
+          <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusStyles(status)}`}>
+            {status}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{getStatusDescription(status)}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 export default function VolunteerHistory() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -45,104 +105,62 @@ export default function VolunteerHistory() {
     }
   };
 
-  const getStatusBadgeClass = (status: string) => {
-    const baseClass = "px-2 py-1 rounded-full text-xs font-medium";
-    switch (status) {
-      case "Participated":
-        return `${baseClass} bg-green-100 text-green-700`;
-      case "Canceled":
-        return `${baseClass} bg-red-100 text-red-700`;
-      case "No Show":
-        return `${baseClass} bg-gray-100 text-gray-700`;
-      case "Pending":
-        return `${baseClass} bg-yellow-100 text-yellow-700`;
-      default:
-        return baseClass;
-    }
-  };
-
   if (loading) return <div className="text-center p-4">Loading history...</div>;
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold mb-4">Volunteer History</h2>
-      <Button
-        onClick={async () => {
-          const email = localStorage.getItem('userEmail');
-          try {
-            const response = await fetch('/api/volunteer-history', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'x-user-email': email || ''
-              },
-              body: JSON.stringify({
-                eventId: '1', // Using the test event ID from your events array
-                eventName: 'Houston Food Bank',
-                status: 'Pending',
-                participationDate: new Date().toLocaleString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: 'numeric',
-                  minute: '2-digit',
-                  second: '2-digit',
-                  timeZoneName: 'short'
-                })
-              })
-            });
-
-            if (response.ok) {
-              fetchHistory(); // Refresh the history list
-            }
-          } catch (error) {
-            console.error('Failed to create history:', error);
-          }
-        }}
-      >
-        Test Add History
-      </Button>
-      {history.length === 0 ? (
-        <p className="text-gray-500">No volunteer history yet.</p>
-      ) : (
-        <div className="grid gap-4">
-          {history.map((entry) => (
-            <div key={entry.id} className="bg-white p-4 rounded-lg shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium">{entry.eventName}</h3>
-                  <p className="text-sm text-gray-500">
-                    {typeof entry.participationDate === 'object' && entry.participationDate !== null
-                      ? new Date(entry.participationDate.seconds * 1000).toLocaleString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: 'numeric',
-                          minute: '2-digit',
-                          timeZoneName: 'short'
-                        })
-                      : entry.participationDate || 'Date not available'}
-                  </p>
-                  {entry.hours && (
-                    <p className="text-sm text-gray-600">
-                      Hours: {entry.hours}
-                    </p>
-                  )}
-                  {entry.feedback && (
-                    <p className="text-sm text-gray-600 mt-2">
-                      Feedback: {entry.feedback}
-                    </p>
-                  )}
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Volunteer History</CardTitle>
+          <CardDescription>Your past and upcoming volunteer activities</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="text-center py-4">Loading history...</div>
+          ) : error ? (
+            <div className="text-center text-red-500 py-4">{error}</div>
+          ) : history.length === 0 ? (
+            <div className="text-center text-muted-foreground py-4">No history entries found</div>
+          ) : (
+            <div className="grid gap-4">
+              {history.map((entry, index) => (
+                <div
+                  key={index}
+                  className="p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-1">
+                      <h3 className="font-medium">{entry.eventName}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {typeof entry.participationDate === 'string' 
+                          ? new Date(entry.participationDate).toLocaleDateString()
+                          : new Date(entry.participationDate.seconds * 1000).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })
+                        }
+                      </p>
+                    </div>
+                    <StatusBadge status={entry.status} />
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    {entry.feedback && (
+                      <p className="text-sm">
+                        <span className="font-medium">Feedback:</span>{' '}
+                        <span className="text-muted-foreground">{entry.feedback}</span>
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <span className={getStatusBadgeClass(entry.status)}>
-                  {entry.status}
-                </span>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
