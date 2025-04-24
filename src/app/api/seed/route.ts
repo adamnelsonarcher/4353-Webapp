@@ -6,67 +6,122 @@ import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 export async function POST() {
   try {
     const auth = getAuth();
-    
-    // Create organization user in Auth
-    await createUserWithEmailAndPassword(auth, "seedorg123@test.com", "Test123!");
 
-    // Add organization user to Firestore
-    await addDoc(collection(db, 'users'), {
-      address: "123 Address Ln",
-      createdAt: Timestamp.fromDate(new Date("2025-03-21T23:30:09")),
-      description: "Testing Org",
-      email: "seedorg123@test.com",
-      orgName: "TestOrg",
-      phone: "8321234444",
-      userType: "organization"
-    });
+    // Create volunteer users in Auth and Firestore
+    const volunteers = [
+      {
+        email: "seedvol555@test.com",
+        name: "John Smith",
+        skills: ["Leadership", "Communication"],
+        address: "1232 Address St."
+      },
+      {
+        email: "seedvol456@test.com",
+        name: "Jane Wilson",
+        skills: ["Teaching", "Problem-Solving"],
+        address: "789 Second St."
+      },
+      {
+        email: "seedvol789@test.com",
+        name: "Mike Johnson",
+        skills: ["Cooking", "Communication"],
+        address: "456 Third Ave."
+      }
+    ];
 
-    // Create volunteer user in Auth
-    await createUserWithEmailAndPassword(auth, "seedvol123@test.com", "Test123!");
+    // Add test events
+    const events = [
+      {
+        eventName: "Community Food Drive",
+        description: "Help distribute food to those in need",
+        date: "2025-03-01",
+        skills: ["Leadership", "Communication"],
+        urgency: "High"
+      },
+      {
+        eventName: "Youth Mentoring Program",
+        description: "Mentor local youth in academic subjects",
+        date: "2025-03-15",
+        skills: ["Teaching", "Communication"],
+        urgency: "Medium"
+      },
+      {
+        eventName: "Senior Center Meal Prep",
+        description: "Prepare meals for local senior center",
+        date: "2025-03-10",
+        skills: ["Cooking", "Leadership"],
+        urgency: "Medium"
+      }
+    ];
 
-    // Add volunteer user to Firestore
-    await addDoc(collection(db, 'profiles'), {
-      address1: "1232 Address St.",
-      address2: "",
-      availability: [{
-        date: "2025-03-28",
-        timeSlots: ["Morning (8AM-12PM)", "Evening (4PM-8PM)"]
-      }],
-      city: "Houston",
-      createdAt: Timestamp.fromDate(new Date("2025-03-20T19:37:33")),
-      email: "seedvol123@test.com",
-      fullName: "Tester Name",
-      preferences: "",
-      skills: ["Leadership", "Communication"]
-    });
+    for (const event of events) {
+      await addDoc(collection(db, 'events'), {
+        createdAt: Timestamp.fromDate(new Date("2025-03-21T23:31:22")),
+        eventDate: event.date,
+        eventDescription: event.description,
+        eventName: event.eventName,
+        location: "Another Community Center",
+        organizerEmail: "seedorg123@test.com",
+        requiredSkills: event.skills,
+        status: "Active",
+        updatedAt: Timestamp.fromDate(new Date("2025-03-21T23:31:22")),
+        urgency: event.urgency
+      });
+    }
 
-    // Add test event
-    await addDoc(collection(db, 'events'), {
-      createdAt: Timestamp.fromDate(new Date("2025-03-21T23:31:22")),
-      eventDate: "2025-03-01",
-      eventDescription: "event Test 1",
-      eventName: "Test Event",
-      location: "Location 1",
-      organizerEmail: "seedorg123@test.com",
-      requiredSkills: ["Leadership", "Communication"],
-      status: "Active",
-      updatedAt: Timestamp.fromDate(new Date("2025-03-21T23:31:22")),
-      urgency: "Medium"
-    });
+    // Add volunteer history entries
+    const volunteerHistory = [
+      {
+        volunteerEmail: "seedvol123@test.com",
+        volunteerName: "John Smith",
+        eventName: "Community Food Drive",
+        date: "2025-03-01",
+        status: "Completed"
+      },
+      {
+        volunteerEmail: "seedvol456@test.com",
+        volunteerName: "Jane Wilson",
+        eventName: "Youth Mentoring Program",
+        date: "2025-03-15",
+        status: "Pending"
+      },
+      {
+        volunteerEmail: "seedvol789@test.com",
+        volunteerName: "Mike Johnson",
+        eventName: "Senior Center Meal Prep",
+        date: "2025-03-10",
+        status: "Completed"
+      },
+      {
+        volunteerEmail: "seedvol123@test.com",
+        volunteerName: "John Smith",
+        eventName: "Youth Mentoring Program",
+        date: "2025-03-15",
+        status: "Pending"
+      },
+      {
+        volunteerEmail: "seedvol456@test.com",
+        volunteerName: "Jane Wilson",
+        eventName: "Senior Center Meal Prep",
+        date: "2025-03-10",
+        status: "Completed"
+      }
+    ];
 
-    // Add volunteer history entry
-    await addDoc(collection(db, 'volunteerHistory'), {
-      createdAt: Timestamp.fromDate(new Date("2025-03-21T23:18:18")),
-      eventId: "1",
-      eventName: "Houston Food Bank",
-      participationDate: Timestamp.fromDate(new Date("2025-03-21T23:18:18")),
-      status: "Pending",
-      updatedAt: Timestamp.fromDate(new Date("2025-03-21T23:18:18")),
-      volunteerId: "seedvol123@test.com",
-      volunteerName: "Tester Name",
-      volunteerEmail: "seedvol123@test.com",
-      organizerEmail: "seedorg123@test.com"
-    });
+    for (const history of volunteerHistory) {
+      await addDoc(collection(db, 'volunteerHistory'), {
+        createdAt: Timestamp.fromDate(new Date("2025-03-21T23:18:18")),
+        eventId: "1",
+        eventName: history.eventName,
+        participationDate: Timestamp.fromDate(new Date(history.date)),
+        status: history.status,
+        updatedAt: Timestamp.fromDate(new Date("2025-03-21T23:18:18")),
+        volunteerId: history.volunteerEmail,
+        volunteerName: history.volunteerName,
+        volunteerEmail: history.volunteerEmail,
+        organizerEmail: "seedorg123@test.com"
+      });
+    }
 
     return NextResponse.json({ message: 'Sample data created successfully' });
   } catch (error) {
