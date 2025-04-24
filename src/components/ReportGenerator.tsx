@@ -102,7 +102,7 @@ export default function ReportGenerator() {
 
       const csvContent = [
         headers.join(','),
-        ...rows.map(row => row.join(','))
+        ...rows.map((row: string[]) => row.join(','))
       ].join('\n');
 
       // Create and download the file
