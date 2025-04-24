@@ -6,7 +6,10 @@ import { Button } from "@/components/ui/button";
 interface HistoryEntry {
   id: string;
   eventName: string;
-  participationDate: string;
+  participationDate: {
+    seconds: number;
+    nanoseconds: number;
+  } | string;
   status: 'Pending' | 'Participated' | 'Canceled' | 'No Show';
   feedback?: string;
   hours?: number;
@@ -110,7 +113,16 @@ export default function VolunteerHistory() {
                 <div>
                   <h3 className="font-medium">{entry.eventName}</h3>
                   <p className="text-sm text-gray-500">
-                    {entry.participationDate || 'Date not available'}
+                    {typeof entry.participationDate === 'object' && entry.participationDate !== null
+                      ? new Date(entry.participationDate.seconds * 1000).toLocaleString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit',
+                          timeZoneName: 'short'
+                        })
+                      : entry.participationDate || 'Date not available'}
                   </p>
                   {entry.hours && (
                     <p className="text-sm text-gray-600">
