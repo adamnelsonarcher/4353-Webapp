@@ -366,25 +366,63 @@ export default function OrganizationDashboard() {
             <h2 className="text-xl font-semibold mb-4">Organization Profile</h2>
             <div className="space-y-4">
               <div className="p-4 bg-secondary/5 rounded-lg">
-                <div className="space-y-2">
-                  <p className="text-sm">
-                    <span className="font-medium">Phone:</span>{' '}
-                    {orgProfile.phone || 'Not provided'}
-                  </p>
-                  <p className="text-sm">
-                    <span className="font-medium">Address:</span>{' '}
-                    {orgProfile.address || 'Not provided'}
-                  </p>
-                  {orgProfile.description && (
-                    <p className="text-sm mt-4">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-primary"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                    </svg>
+                    <p className="text-sm">
+                      <span className="font-medium">Phone:</span>{' '}
+                      {orgProfile.phone || 'Not provided'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-primary"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm">
+                      <span className="font-medium">Address:</span>{' '}
+                      {orgProfile.address || 'Not provided'}
+                    </p>
+                  </div>
+                  {orgProfile.createdAt && (
+                    <div className="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-primary"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                      </svg>
+                      <p className="text-sm">
+                        <span className="font-medium">Member since:</span>{' '}
+                        {new Date(orgProfile.createdAt?.seconds * 1000).toLocaleDateString()}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                {orgProfile.description && (
+                  <div className="mt-4 pt-4 border-t">
+                    <p className="text-sm">
                       <span className="font-medium">About:</span><br />
                       {orgProfile.description}
                     </p>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 className="w-full"
                 onClick={() => {/* TODO: Add edit profile functionality */}}
@@ -696,14 +734,7 @@ export default function OrganizationDashboard() {
                             <div>
                               <p className="text-sm font-medium">{entry.eventName}</p>
                               <p className="text-xs text-secondary-foreground">
-                                {entry.participationDate 
-                                  ? new Date(entry.participationDate.seconds * 1000).toLocaleDateString('en-US', {
-                                      year: 'numeric',
-                                      month: 'long',
-                                      day: 'numeric'
-                                    })
-                                  : 'Date not set'
-                                }
+                                {new Date(entry.participationDate.seconds * 1000).toLocaleDateString()}
                               </p>
                             </div>
                             <div className="flex items-center gap-2">
@@ -732,22 +763,58 @@ export default function OrganizationDashboard() {
           </div>
           
           {/* Quick Stats */}
-          <div className={`feature-card h-[200px] ${
+          <div className={`feature-card ${
             firstOpenedForm ? 'order-last' : 'order-none'
           }`}>
             <h2 className="text-xl font-semibold mb-4">Quick Stats</h2>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-2 bg-secondary/5 rounded-lg">
-                <span className="text-secondary-foreground">Active Events</span>
-                <span className="font-medium">{stats.activeEvents}</span>
+              <div className="flex items-center justify-between p-3 bg-secondary/5 rounded-lg hover:bg-secondary/10 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-full">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-primary"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium">Total Volunteers</span>
+                </div>
+                <span className="text-2xl font-semibold">{stats.totalVolunteers}</span>
               </div>
-              <div className="flex items-center justify-between p-2 bg-secondary/5 rounded-lg">
-                <span className="text-secondary-foreground">Total Volunteers</span>
-                <span className="font-medium">{stats.totalVolunteers}</span>
+              <div className="flex items-center justify-between p-3 bg-secondary/5 rounded-lg hover:bg-secondary/10 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 rounded-full">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-green-600"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium">Active Events</span>
+                </div>
+                <span className="text-2xl font-semibold">{stats.activeEvents}</span>
               </div>
-              <div className="flex items-center justify-between p-2 bg-secondary/5 rounded-lg">
-                <span className="text-secondary-foreground">Pending Applications</span>
-                <span className="font-medium">{stats.pendingApplications}</span>
+              <div className="flex items-center justify-between p-3 bg-secondary/5 rounded-lg hover:bg-secondary/10 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-yellow-100 rounded-full">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-yellow-600"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium">Pending Applications</span>
+                </div>
+                <span className="text-2xl font-semibold">{stats.pendingApplications}</span>
               </div>
             </div>
           </div>

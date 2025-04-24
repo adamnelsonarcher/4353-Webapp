@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 
 export async function GET(request: Request) {
   try {
@@ -13,7 +13,8 @@ export async function GET(request: Request) {
     // Get volunteer history for this organization
     const historyQuery = query(
       collection(db, 'volunteerHistory'),
-      where('organizerEmail', '==', orgEmail)
+      where('organizerEmail', '==', orgEmail),
+      orderBy('participationDate', 'desc')
     );
     
     const historySnapshot = await getDocs(historyQuery);
@@ -48,17 +49,10 @@ export async function GET(request: Request) {
       }
 
       const volunteer = volunteerMap.get(entry.volunteerId);
-      
-      // Convert Firestore Timestamp to milliseconds for the frontend
-      const participationDate = entry.participationDate ? {
-        seconds: entry.participationDate.seconds,
-        nanoseconds: entry.participationDate.nanoseconds
-      } : null;
-
       volunteer.history.push({
         id: entry.id,
         eventName: entry.eventName,
-        participationDate,
+        participationDate: entry.participationDate,
         status: entry.status,
         hours: entry.hours || 0,
         feedback: entry.feedback || ''
@@ -69,14 +63,6 @@ export async function GET(request: Request) {
         volunteer.totalHours += (entry.hours || 0);
       }
       volunteer.eventsParticipated++;
-    }
-
-    // Sort each volunteer's history by date
-    for (const volunteer of volunteerMap.values()) {
-      volunteer.history.sort((a, b) => {
-        if (!a.participationDate || !b.participationDate) return 0;
-        return b.participationDate.seconds - a.participationDate.seconds;
-      });
     }
 
     return NextResponse.json(Array.from(volunteerMap.values()));
